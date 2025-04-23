@@ -1,4 +1,8 @@
 import streamlit as st
+import os
+
+secret_value = os.getenv("TESTING1")
+print(secret_value)
 
 st.set_page_config(page_title="ACPN2025", layout="wide")
 st.title("ACPN2025 Platform")
