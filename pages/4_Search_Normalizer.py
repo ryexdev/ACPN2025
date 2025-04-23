@@ -32,9 +32,8 @@ RULES:
 4. Convert 2-digit years to 4-digit (94 → 1994)
 5. Normalize capitalization (honda → Honda)
 6. Recognize part slang (front end → Front Bumper)
-7. If part is unclear, suggest a common replacement part
-8. If any field cannot be determined, use null
-9. ALWAYS return a part name, never null
+7. If part is unclear, suggest a part name only that may fix the issue, e.g., "Piston Ring"
+8. ALWAYS return a part name, never null
 
 Output format: {"year": "1994", "make": "Honda", "model": "Civic", "part": "Piston Ring"}
 """
