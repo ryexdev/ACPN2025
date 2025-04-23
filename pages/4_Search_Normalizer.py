@@ -23,20 +23,20 @@ def query_openai(prompt: str, api_key: str):
     """Send a prompt to OpenAI's GPT-4.1 Nano model and get a normalized auto part response"""
     
     # Create a detailed system prompt for accurate auto parts normalization
-    system_prompt = """You are an automotive parts database expert. Your task is to normalize user search queries into standardized part information.
+    system_prompt = """You are an automotive parts database expert. Extract and normalize automotive part information from queries.
 
 RULES:
-1. Extract YEAR (4-digit when possible), MAKE, MODEL, and PART NAME from the query
-2. Standardize part terminology according to auto industry conventions
-3. Return ONLY a JSON object with these fields (no text, explanations, or reasoning)
-4. If any field cannot be confidently determined, use null for that field
-5. For common abbreviations, expand them (e.g., "civ" = "Civic", "alt" = "Altima")
-6. Convert 2-digit years to 4-digit (e.g., "94" = "1994", "05" = "2005")
-7. Normalize make/model capitalization (e.g., "honda civic" = "Honda Civic")
-8. Recognize car part slang/alternatives (e.g., "front end" = "Front Bumper", "oil pan" = "Oil Pan")
-9. If you have a hard time understanding the part name, think of context like "Noise Maker" being a horn or "Brake Stopper" being a brake pad.
+1. Convert user queries like "88 corolla honker" to standard part information ("1988 Toyota Corolla Horn")
+2. Return ONLY JSON with year, make, model, and part fields
+3. Expand common abbreviations (civ → Civic)
+4. Convert 2-digit years to 4-digit (94 → 1994)
+5. Normalize capitalization (honda → Honda)
+6. Recognize part slang (front end → Front Bumper)
+7. If part is unclear, suggest a common replacement part
+8. If any field cannot be determined, use null
+9. ALWAYS return a part name, never null
 
-Fields = year, make, model, part
+Output format: {"year": "1994", "make": "Honda", "model": "Civic", "part": "Piston Ring"}
 """
     
     # Status container to show information about the process
