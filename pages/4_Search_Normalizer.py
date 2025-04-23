@@ -23,19 +23,9 @@ def query_openai(prompt: str, api_key: str):
     """Send a prompt to OpenAI's GPT-4.1 Nano model and get a normalized auto part response"""
     
     # Create a detailed system prompt for accurate auto parts normalization
-    system_prompt = """You are an automotive parts database expert. Extract and normalize automotive part information from queries.
-
-RULES:
-1. Convert user queries like "88 corolla honker" to standard part information ("1988 Toyota Corolla Horn")
-2. Return ONLY JSON with year, make, model, and part fields
-3. Expand common abbreviations (civ → Civic)
-4. Convert 2-digit years to 4-digit (94 → 1994)
-5. Normalize capitalization (honda → Honda)
-6. Recognize part slang (front end → Front Bumper)
-7. If part is unclear, suggest a part name only that may fix the issue, e.g., "Piston Ring"
-8. ALWAYS return a part name, never null
-
-Output format: {"year": "1994", "make": "Honda", "model": "Civic", "part": "Piston Ring"}
+    system_prompt = """You are a seach engine for auto parts. Take a search query and normalize it to a JSON object with the following fields:
+    Output format: {"year": "1994", "make": "Honda", "model": "Civic", "part": "Piston Ring"}
+    Try and infer what part the customer needs, even if given just a symptom or a vague description.
 """
     
     # Status container to show information about the process
@@ -47,13 +37,8 @@ Output format: {"year": "1994", "make": "Honda", "model": "Civic", "part": "Pist
         step2 = st.empty()
         step3 = st.empty()
         
-        # Step 1: Show the user's query
-        step1.info(f"📝 Query recognized: '{prompt}'")
-        time.sleep(0.5)  # Give user time to see this step
-        
         # Step 2: Building request
-        step2.info("🔧 Building API request with system instructions...")
-        time.sleep(0.7)  # Give user time to see this step
+        step2.info("🔧 Building API request...")
     
     # Create the API request
     headers = {
@@ -78,28 +63,10 @@ Output format: {"year": "1994", "make": "Honda", "model": "Civic", "part": "Pist
     
     # Step 3: Making the API call
     with status_container:
-        step3.warning("🔄 Sending to AI model and awaiting response...")
-        progress_bar = st.progress(0)
-        status_text = st.empty()
-    
-    # Make the API call and time it
-    start_time = time.time()
+        step3.warning("🔄 Sending to AI model...")
     
     try:
-        # Simulate API call progress (slower to give user more insight)
-        for percent_complete in range(101):
-            time.sleep(0.03)  # Longer delay to show progress more clearly
-            progress_bar.progress(percent_complete)
-            if percent_complete < 30:
-                status_text.text("Analyzing automotive terms...")
-            elif percent_complete < 60:
-                status_text.text("Normalizing part terminology...")
-            elif percent_complete < 90:
-                status_text.text("Structuring JSON response...")
-            else:
-                status_text.text("Finalizing results...")
-            
-        # Actual API call
+        # Direct API call without simulated delays
         response = requests.post(
             "https://api.openai.com/v1/chat/completions",
             headers=headers,
@@ -107,21 +74,17 @@ Output format: {"year": "1994", "make": "Honda", "model": "Civic", "part": "Pist
             timeout=15
         )
         response.raise_for_status()
-        end_time = time.time()
-        processing_time = round(end_time - start_time, 2)
         
         with status_container:
-            status_text.text(f"✅ Complete in {processing_time} seconds!")
-            step3.success("✅ Response received from AI model")
+            step3.success("✅ Response received")
         
-        return response.json(), processing_time, status_container
+        return response.json(), status_container
     
     except requests.exceptions.RequestException as e:
         with status_container:
-            status_text.text("❌ Error during API call!")
             step3.error("❌ API call failed")
         st.error(f"Error calling OpenAI API: {str(e)}")
-        return {"error": str(e)}, 0, status_container
+        return {"error": str(e)}, status_container
 
 # Main app logic
 st.header("Auto Parts Search")
@@ -149,7 +112,7 @@ if go_button and search_query and api_key:
 
 if st.session_state.is_processing and search_query and api_key:
     # Call OpenAI API
-    response, processing_time, status_container = query_openai(search_query, api_key)
+    response, status_container = query_openai(search_query, api_key)
     
     # Display results
     if "error" in response:
@@ -160,29 +123,31 @@ if st.session_state.is_processing and search_query and api_key:
             content = response["choices"][0]["message"]["content"]
             normalized_data = json.loads(content)
             
-            # Display normalized data in a nice format
-            st.success("✨ Normalization successful!")
+            # Show raw JSON output
+            st.info(f"Raw JSON output: {content}")
             
-            # Create a table with the normalized data
-            col1, col2 = st.columns([1, 1])
+            # Generate customer statement
+            year = normalized_data.get("year", "")
+            make = normalized_data.get("make", "")
+            model = normalized_data.get("model", "")
+            part = normalized_data.get("part", "")
             
-            with col1:
-                st.subheader("Normalized Result")
-                data_table = {
-                    "Field": ["Year", "Make", "Model", "Part"],
-                    "Value": [
-                        normalized_data.get("year", "N/A"),
-                        normalized_data.get("make", "N/A"),
-                        normalized_data.get("model", "N/A"),
-                        normalized_data.get("part", "N/A")
-                    ]
-                }
-                st.table(data_table)
+            # Create the statement
+            vehicle_info = ""
+            if year:
+                vehicle_info += year + " "
+            if make:
+                vehicle_info += make + " "
+            if model:
+                vehicle_info += model
             
-            with col2:
-                st.subheader("JSON Output")
-                st.json(normalized_data)
-            
+            if vehicle_info and part:
+                st.success(f"The customer is looking for a **{part}** for their **{vehicle_info.strip()}**.")
+            elif part:
+                st.success(f"The customer is looking for a **{part}**.")
+            else:
+                st.error("Unable to determine what the customer is looking for.")
+
             # Reset processing state for next search
             st.session_state.is_processing = False
             
