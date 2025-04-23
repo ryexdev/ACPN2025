@@ -5,5 +5,5 @@ st.header("PIES Descriptions")
 st.write("This is the PIES Descriptions tab.")
 
 st.header("Secret Test")
-secret_test = os.getenv("TESTING1")
+secret_test = os.environ['TESTING2']
 st.write(f"Secret Test: {secret_test}")
