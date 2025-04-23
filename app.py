@@ -1,3 +1,5 @@
 import streamlit as st
-st.title("My Streamlit App")
-st.write("Hello from DigitalOcean!")
+
+st.set_page_config(page_title="ACPN2025", layout="wide")
+st.title("ACPN2025 Platform")
+st.write("Welcome. Use the sidebar to navigate between tabs/pages.")
