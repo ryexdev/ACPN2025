@@ -7,9 +7,14 @@ import os
 # Configure page settings
 st.set_page_config(page_title="ACPN2025", layout="wide")
 
-# Title and introduction
-st.title("ACPN2025 Platform")
-st.write("Welcome to the Auto Parts Search Normalizer.")
+st.markdown("""
+🔍 **How it works:**
+
+1. You enter a search—anything from a symptom to a part name.
+2. 🚀 Your search is sent to an AI model for processing.
+3. 🧠 The AI analyzes it and extracts details: **year**, **make**, **model**, and **part**.
+4. 📦 You see both the extracted info and the raw JSON output for transparency.
+""")
 
 # Get API key from user input
 secret_value = os.getenv("OwadmasdujU")
