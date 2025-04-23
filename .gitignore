@@ -1,0 +1,5 @@
+# Streamlit
+.streamlit
+
+# Streamlit Cache
+.streamlit/secrets.toml
