@@ -1,16 +1,18 @@
 import streamlit as st
 import os
-
 # Set page configuration
 st.set_page_config(
-    page_title="ACPN2025", 
-    layout="wide"
+    page_title="ACPN 2025", 
+    layout="wide",
+    page_icon="🚗♥🤖"  # Added favicon
 )
 
-# Title and intro
-st.title("ACPN 2025 Platform 🚗 🤖")
+# Title
+st.write("""
+# Welcome to the Ryan² ACPN 2025 Demo! 🚗♥🤖
+""")
 
-# Animated text effect using HTML/CSS
+# Animated text effect using HTML/CSS - Repositioned
 st.markdown("""
 <style>
 .gradient-text {
@@ -23,7 +25,6 @@ st.markdown("""
     font-weight: bold;
     font-size: 1.2em;
 }
-
 @keyframes gradient {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
@@ -33,17 +34,14 @@ st.markdown("""
 <p class="gradient-text">Bringing AI to the Automotive Aftermarket!</p>
 """, unsafe_allow_html=True)
 
+# Content
 st.write("""
-# Welcome to the Ryan² ACPN 2025 Demo! 🚀
-
 💡 We're showcasing practical, day-to-day applications of AI 
 within the automotive aftermarket industry using off-the-shelf technology.
-
 ✨ This is a **live showcase** that demonstrates real AI tools you can implement today to:
 * 🔍 Streamline content management
 * 📊 Improve data quality 
 * 🛠️ Enhance your catalog operations
-
 ⬅️ Use the sidebar to navigate between different demos and examples.
 📱 If you are on mobile, you may need to hit the arrow (>) to open the sidebar.
          
