@@ -27,10 +27,9 @@ st.markdown("""
 
 # Content
 st.write("""
-💡 We're showcasing practical, day-to-day applications of AI 
-within the automotive aftermarket industry using off-the-shelf technology.
+💡 We're showcasing practical, day-to-day applications of AI within the automotive aftermarket industry using off-the-shelf technology.
 
-✨ This is a **live showcase** that demonstrates real AI tools you can implement today to:
+This is a **live showcase** that demonstrates real AI tools you can implement today to:
 * 🔍 Streamline content management
 * 📊 Improve data quality 
 * 🛠️ Enhance your catalog operations
