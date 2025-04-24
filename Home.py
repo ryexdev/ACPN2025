@@ -8,7 +8,7 @@ st.set_page_config(
 )
 
 # Title
-st.title("Welcome to the Ryan² ACPN 2025 Demo! 🚗 🤖")
+st.title("Welcome to the Ryan² ACPN 2025 Demo! 🚗❤️🤖")
 
 # Gradient text - simplified CSS
 st.markdown("""
