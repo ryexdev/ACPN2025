@@ -94,43 +94,29 @@ def query_openai(prompt: str, api_key: str):
 # Main app logic
 st.write("Enter a search query like '94 Civic front end' and see how it gets normalized.")
         
-# Initialize session state variables
+# Search input
 if 'search_query' not in st.session_state:
     st.session_state.search_query = ""
     
+# Initialize session state for processing status
 if 'is_processing' not in st.session_state:
     st.session_state.is_processing = False
 
-# Function to process search
-def process_search():
-    if st.session_state.search_query and api_key:
-        st.session_state.is_processing = True
+search_query = st.text_input("Search for auto parts:", value=st.session_state.search_query, 
+                             placeholder="Example: 94 Civic front end")
 
-# Create form to capture Enter key
-with st.form(key='search_form'):
-    search_query = st.text_input(
-        "Search for auto parts:", 
-        value=st.session_state.search_query,
-        placeholder="Example: 94 Civic front end",
-        key="search_input"
-    )
-    
-    # Store the search query in session state when changed
-    st.session_state.search_query = search_query
-    
-    # Add the submit button inside the form
-    submit_button = st.form_submit_button("Go!", type="primary", on_click=process_search)
-
-# Add a regular button outside the form for visual consistency (optional)
+# Add a Go button instead of automatic processing
 search_col, button_col = st.columns([5, 1])
 with button_col:
-    # This button won't be needed with the form approach, but keeping for visual reference
-    go_button = st.button("Go!", type="primary", use_container_width=True, key="go_button_outside", disabled=True)
+    go_button = st.button("Go!", type="primary", use_container_width=True)
 
-# Process when search is submitted
-if st.session_state.is_processing and st.session_state.search_query and api_key:
+# Process when user clicks the Go button
+if go_button and search_query and api_key:
+    st.session_state.is_processing = True
+
+if st.session_state.is_processing and search_query and api_key:
     # Call OpenAI API
-    response, status_container = query_openai(st.session_state.search_query, api_key)
+    response, status_container = query_openai(search_query, api_key)
     
     # Display results
     if "error" in response:
@@ -176,6 +162,6 @@ if st.session_state.is_processing and st.session_state.search_query and api_key:
     else:
         st.error("No response received from API")
         st.session_state.is_processing = False
-elif st.session_state.search_query and not api_key and st.session_state.is_processing:
+elif search_query and not api_key and go_button:
     st.warning("Please enter your API key to process the search query.")
     st.session_state.is_processing = False
