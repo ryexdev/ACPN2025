@@ -1,4 +1,8 @@
 import streamlit as st
+import classes.db.initalize_database as initialize_database
+
+# Initialize the database
+initialize_database.InitializeDatabase().create_database()
 
 # Set page configuration - simpler approach
 st.set_page_config(
