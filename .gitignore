@@ -3,8 +3,23 @@
 venv
 venv/
 
+# Environment Variables
+.env
+
 # Streamlit
 .streamlit
 
 # Streamlit Cache
 .streamlit/secrets.toml
+
+# Database
+pies.db
+
+# Logs
+logs/
+
+# Test files
+tests/
+
+# Python Cache
+__pycache__/
