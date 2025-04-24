@@ -5,7 +5,7 @@ import time
 import os
 
 # Configure page settings
-st.set_page_config(page_title="ACPN2025", layout="wide")
+st.set_page_config(page_title="ACPN 2025", layout="wide")
 
 st.markdown("""
 🔍 **How it works:**
