@@ -30,8 +30,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Content
-st.write("""
-💡 We're showcasing practical, day-to-day applications of AI within the automotive aftermarket industry using off-the-shelf technology.
+st.write("""We're showcasing practical, day-to-day applications of AI within the automotive aftermarket industry using off-the-shelf technology.
 
 This is a **live showcase** that demonstrates real AI tools you can implement today to:
 * 🔍 Streamline content management
@@ -39,7 +38,8 @@ This is a **live showcase** that demonstrates real AI tools you can implement to
 * 🛠️ Enhance your catalog operations
 
 ⬅️ Use the sidebar to navigate between different demos and examples.
+
 📱 If you are on mobile, you may need to hit the arrow (>) to open the sidebar.
          
-🤝 Feel free to reach out to either Ryan with any questions!
+Feel free to reach out to either Ryan with any questions!
 """)
