@@ -86,7 +86,7 @@ st.sidebar.title("AI Model Selection")
 model_source = st.sidebar.radio("Choose Model Source:", ["OpenAI", "Ollama"])
 
 if model_source == "OpenAI":
-    model_name = st.sidebar.selectbox("Select OpenAI Model:", ["gpt-4o-mini", "gpt-4o", "gpt-3.5-turbo"])
+    model_name = st.sidebar.selectbox("Select OpenAI Model:", ["gpt-4o-mini", "gpt-4o", "gpt-3.5-turbo","gpt-4.1-nano"])
     
     # Get API key from user input
     secret_value = os.getenv("OwadmasdujU")
