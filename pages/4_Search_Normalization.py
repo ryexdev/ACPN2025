@@ -18,14 +18,11 @@ else:
 
 # Function to call OpenAI API with GPT-4.1 Nano
 def query_openai(prompt: str, api_key: str):
-    """Send a prompt to OpenAI's GPT-4.1 Nano model and get a normalized auto part response"""
-    
     # Create a detailed system prompt for accurate auto parts normalization
-    system_prompt = """You are a seach engine for auto parts. Take a search query and normalize it to a JSON object with the following fields:
+    system_prompt = """You are a search engine for auto parts. Take a search query and normalize it to a JSON object with the following fields:
     Output format: {"year": "1994", "make": "Honda", "model": "Civic", "part": "Piston Ring"}
     Try and infer what part the customer needs, even if given just a symptom or a vague description.
-    Convert all slang and common terms to the correct part name.
-"""
+    Convert all slang and common terms to the correct part name."""
     
     # Status container to show information about the process
     status_container = st.container()

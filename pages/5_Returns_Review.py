@@ -42,7 +42,7 @@ Perfect fit for my 2017 Mazda CX-5, even though some reviewers say it only works
 Bought this for my 2019 Lincoln MKC and the bolt holes don't align properly. Had to return it."""
 
 # Text area for reviews
-st.write("""We have a batch of fake reviews for a front wheel hub assembly. The AI goes through the reviews and identifies any fitment issues that are reported.
+st.write("""We have a batch of AI generated reviews for a front wheel hub assembly. The AI goes through the reviews and identifies any fitment issues that are reported.
 
 Feel free to add or modify the reviews in the text area below. The AI will analyze the reviews and identify any fitment issues reported by customers.""")
 reviews = st.text_area("Customer Reviews for Front Wheel Hub Assembly", 
