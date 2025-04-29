@@ -5,16 +5,9 @@ import time
 import os
 
 # Configure page settings
-st.set_page_config(page_title="ACPN 2025", layout="wide")
+st.set_page_config(page_title="Search", layout="wide",page_icon="🔍")
 
-st.markdown("""
-🔍 **How it works:**
-
-1. You enter a search—anything from a symptom to a part name.
-2. 🚀 Your search is sent to an AI model for processing.
-3. 🧠 The AI analyzes it and extracts details: **year**, **make**, **model**, and **part**.
-4. 📦 You see both the extracted info and the raw JSON output for transparency.
-""")
+st.info("🤖💬 Normalize slang and common terms for cars and parts, help funnel the customer to the right part!")
 
 # Get API key from user input
 secret_value = os.getenv("OwadmasdujU")
@@ -25,13 +18,11 @@ else:
 
 # Function to call OpenAI API with GPT-4.1 Nano
 def query_openai(prompt: str, api_key: str):
-    """Send a prompt to OpenAI's GPT-4.1 Nano model and get a normalized auto part response"""
-    
     # Create a detailed system prompt for accurate auto parts normalization
-    system_prompt = """You are a seach engine for auto parts. Take a search query and normalize it to a JSON object with the following fields:
+    system_prompt = """You are a search engine for auto parts. Take a search query and normalize it to a JSON object with the following fields:
     Output format: {"year": "1994", "make": "Honda", "model": "Civic", "part": "Piston Ring"}
     Try and infer what part the customer needs, even if given just a symptom or a vague description.
-"""
+    Convert all slang and common terms to the correct part name."""
     
     # Status container to show information about the process
     status_container = st.container()
@@ -92,7 +83,9 @@ def query_openai(prompt: str, api_key: str):
         return {"error": str(e)}, status_container
 
 # Main app logic
-st.write("Enter a search query like '94 Civic front end' and see how it gets normalized.")
+st.write("""Enter a search query like '94 Civic front end' or '88 e30 blue smoke' and see how it gets normalized. 
+
+This can help customers who are searching for parts but may not know the exact terminology.""")
         
 # Search input
 if 'search_query' not in st.session_state:
