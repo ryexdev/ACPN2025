@@ -5,7 +5,7 @@ import time
 import os
 
 # Configure page settings
-st.set_page_config(page_title="ACPN 2025", layout="wide")
+st.set_page_config(page_title="Search", layout="wide",page_icon="🔍")
 
 st.info("🤖💬 Normalize slang and common terms for cars and parts, help funnel the customer to the right part!")
 

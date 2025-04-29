@@ -4,7 +4,7 @@ import requests
 import os
 
 # Configure page settings
-st.set_page_config(page_title="Fitment Issue Detector", layout="wide")
+st.set_page_config(page_title="Reviews", layout="wide",page_icon="🧑‍🔧")
 
 # Header and description
 st.info("🤖💬 Identify and flag recurring fitment issues reported in customer reviews or support interactions")
