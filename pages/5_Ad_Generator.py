@@ -250,7 +250,7 @@ Do not include any text in the image."""
     st.markdown("#### Model Settings")
     openai_model = st.selectbox(
         "OpenAI Model",
-        ["gpt-4o", "gpt-4o-mini", "gpt-3.5-turbo"],
+        ["gpt-4.1-nano", "gpt-4o-mini", "gpt-3.5-turbo"],
         index=1
     )
     os.environ['OPENAI_MODEL'] = openai_model
@@ -285,7 +285,7 @@ def generate_ad_text(part_type, brand, ad_style, platform, target_audience, max_
     }
     
     payload = {
-        "model": os.getenv('OPENAI_MODEL', "gpt-4o-mini"),
+        "model": os.getenv('OPENAI_MODEL', "gpt-4.1-nano"),
         "messages": [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
