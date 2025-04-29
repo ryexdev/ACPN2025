@@ -95,8 +95,6 @@ if model_source == "OpenAI":
     else:
         api_key = st.sidebar.text_input("Enter OpenAI API Key:", type="password", value=secret_value)
     
-    # Set API key for this request
-    os.environ["OPENAI_API_KEY"] = api_key
 else:
     ollama_url = st.sidebar.text_input("Ollama Server URL", value=os.getenv("OLLAMA_URL", "http://localhost:11434"))
     
