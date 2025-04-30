@@ -104,8 +104,7 @@ def rewrite_description(raw_text: str, api_key: str):
         response = requests.post(
             "https://api.openai.com/v1/chat/completions",
             headers=headers,
-            json=payload,
-            timeout=30
+            json=payload
         )
         
         response.raise_for_status()

@@ -66,8 +66,7 @@ def query_openai(prompt: str, api_key: str):
         response = requests.post(
             "https://api.openai.com/v1/chat/completions",
             headers=headers,
-            json=payload,
-            timeout=15
+            json=payload
         )
         response.raise_for_status()
         
