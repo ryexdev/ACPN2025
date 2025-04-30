@@ -42,58 +42,21 @@ raw_description = st.text_area("Raw Supplier Description",
                        value=default_description,
                        height=100)
 
-# Options for description format
-st.subheader("Output Preferences")
-col1, col2, col3 = st.columns(3)
-
-with col1:
-    tone = st.selectbox(
-        "Tone",
-        ("Professional", "Technical", "Customer-friendly")
-    )
-
-with col2:
-    length = st.selectbox(
-        "Length",
-        ("Concise", "Standard", "Detailed")
-    )
-
-with col3:
-    structure = st.selectbox(
-        "Structure",
-        ("Paragraph format", "Bullet points", "Hybrid (paragraph + bullets)")
-    )
 
 # Function to call API for description rewriting
-def rewrite_description(raw_text: str, tone: str, length: str, structure: str, api_key: str):
-    """Send raw description to AI model to create standardized marketing copy"""
-    
+def rewrite_description(raw_text: str, api_key: str):    
     # Create a system prompt for description rewriting
-    system_prompt = f"""You are an automotive parts description expert specializing in creating standardized marketing copy.
-
-    Transform the raw supplier description into clear, professional marketing copy that:
-    1. Highlights key product attributes and benefits
-    2. Clearly states fitment details (year/make/model compatibility)
-    3. Organizes technical specifications in a standardized way
-    4. Uses industry-standard terminology
-    5. Removes redundancies and clarifies ambiguities
-    
-    Format with a:
-    - Tone: {tone}
-    - Length: {length}
-    - Structure: {structure}
+    system_prompt = f"""You are an automotive parts description expert specializing in creating standardized marketing copy. Transform the raw supplier description into clear, professional, concise, marketing copy.
     
     JSON format for your response:
-    {{
-        "title": "Product title in clear, concise format",
-        "description": "The main marketing description",
-        "compatibility": "Clear statement of vehicle compatibility",
-        "specifications": [List of key specifications in standardized format],
-        "features_benefits": [List of key features and their benefits to the customer],
-        "fitment_notes": "Any important notes about installation or fitment"
-    }}
+    "title": "Product title in clear, concise format",
+    "description": "The main marketing description",
+    "compatibility": "Clear statement of vehicle compatibility",
+    "specifications": [List of key specifications in standardized format],
+    "features_benefits": [List of key features and their benefits to the customer],
+    "fitment_notes": "Any important notes about installation or fitment
     
-    Prioritize accuracy, clarity, and standardization. Focus on information that matters most to automotive customers.
+    Make sure all important notes are included in the response.
     """
     
     # Status container to show information about the process
@@ -142,8 +105,9 @@ def rewrite_description(raw_text: str, tone: str, length: str, structure: str, a
             "https://api.openai.com/v1/chat/completions",
             headers=headers,
             json=payload,
-            timeout=15
+            timeout=30
         )
+        
         response.raise_for_status()
         
         with status_container:
@@ -163,7 +127,7 @@ go_button = st.button("Rewrite Description", type="primary")
 # Process when user clicks the Go button
 if go_button and api_key and raw_description:
     # Call API
-    response, status_container = rewrite_description(raw_description, tone, length, structure, api_key)
+    response, status_container = rewrite_description(raw_description, api_key)
     
     # Display formatted results
     if "error" in response:
