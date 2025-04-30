@@ -83,9 +83,24 @@ def query_openai(prompt: str, api_key: str):
         return {"error": str(e)}, status_container
 
 # Main app logic
-st.write("""Enter a search query like '94 Civic front end' or '88 e30 blue smoke' and see how it gets normalized. 
+st.write("""Enter a query like '94 Civic front end' or '88 e30 blue smoke' below to see how it gets converted into precise part information. This helps match customer descriptions to the correct parts, even when they use informal language or describe symptoms rather than parts.""")
 
-This can help customers who are searching for parts but may not know the exact terminology.""")
+# Example buttons
+examples = [
+    "2010 Camry squeeling",
+    "F150 2015 blinker fluid",
+    "2005 BMW 5 idle rough and stalling"
+]
+
+# Create horizontal layout for example buttons
+cols = st.columns(len(examples))
+for i, col in enumerate(cols):
+    with col:
+        if st.button(examples[i], key=f"example_{i}", use_container_width=True):
+            st.session_state.search_query = examples[i]
+            st.session_state.is_processing = True
+            # Use st.rerun() instead of st.experimental_rerun()
+            st.rerun()
         
 # Search input
 if 'search_query' not in st.session_state:
@@ -103,11 +118,8 @@ search_col, button_col = st.columns([5, 1])
 with button_col:
     go_button = st.button("Go!", type="primary", use_container_width=True)
 
-# Process when user clicks the Go button
-if go_button and search_query and api_key:
-    st.session_state.is_processing = True
-
-if st.session_state.is_processing and search_query and api_key:
+# Process when user clicks the Go button or an example button was clicked
+if (go_button or st.session_state.is_processing) and search_query and api_key:
     # Call OpenAI API
     response, status_container = query_openai(search_query, api_key)
     
