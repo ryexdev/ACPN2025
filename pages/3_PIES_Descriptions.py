@@ -88,12 +88,12 @@ model_source = st.sidebar.radio("Choose Model Source:", ["OpenAI", "Ollama"])
 if model_source == "OpenAI":
     model_name = st.sidebar.selectbox("Select OpenAI Model:", ["gpt-4o-mini", "gpt-4o", "gpt-3.5-turbo","gpt-4.1-nano"])
     
-    # Get API key from user input
+    # Get API key from environment variable or ask user
     secret_value = os.getenv("OwadmasdujU")
     if not secret_value:
-        api_key = st.sidebar.text_input("Enter OpenAI API Key:", type="password")
+        api_key = st.text_input("Enter your API key:", type="password")
     else:
-        api_key = st.sidebar.text_input("Enter OpenAI API Key:", type="password", value=secret_value)
+        api_key = secret_value
     
 else:
     ollama_url = st.sidebar.text_input("Ollama Server URL", value=os.getenv("OLLAMA_URL", "http://localhost:11434"))
