@@ -172,25 +172,36 @@ if not api_key:
 # Part information input
 st.header("Ad Information")
 
+options = [
+    {"PartType":"Ignition Coil", "Brand": "Bosch", "Style": "Funny", "Platform": "Instagram", "Audience": "DIY Mechanics", "Max Length": 375},
+    {"PartType":"Mass Air Flow Sensor", "Brand": "United Motor Products", "Style": "Funny", "Platform": "LinkedIn", "Audience": "Professional Mechanics", "Max Length": 275},
+    {"PartType":"Oil Filter", "Brand": "Frame", "Style": "Funny", "Platform": "Facebook", "Audience": "General Public", "Max Length": 300},
+    {"PartType":"Air Filter", "Brand": "Wix", "Style": "Funny", "Platform": "TikTok", "Audience": "Car Enthusiasts", "Max Length": 250},
+    {"PartType":"Brake Pad", "Brand": "Perfect Stop", "Style": "Funny", "Platform": "LinkedIn", "Audience": "Educational", "Max Length": 350},
+    {"PartType":"Brake Rotor", "Brand": "Winhere", "Style": "Funny", "Platform": "Twitter/X", "Audience": "DIY Mechanics", "Max Length": 275},
+    {"PartType":"Brake Caliper", "Brand": "Cardone", "Style": "Funny", "Platform": "Facebook", "Audience": "General Public", "Max Length": 400},
+    {"PartType":"Brake Line", "Brand": "Dorman", "Style": "Funny", "Platform": "TikTok", "Audience": "Car Enthusiasts", "Max Length": 450}
+]
+
 col1, col2 = st.columns(2)
 with col1:
-    part_type = st.text_input("Automotive Part Type", placeholder="e.g., Ignition Coil, Mass Air Flow Sensor")
-    brand = st.text_input("Brand (optional)", placeholder="e.g., ACDelco, Bosch")
+    part_type = st.selectbox("Automotive Part Type", options=[opt["PartType"] for opt in options],index=0)
+    brand = st.selectbox("Brand (optional)", options=[opt["Brand"] for opt in options if opt["PartType"] == part_type],index=0)
     target_audience = st.selectbox(
         "Target Audience",
-        ["DIY Mechanics", "Professional Mechanics", "Car Enthusiasts", "General Public"]
+        [opt["Audience"] for opt in options if opt["PartType"] == part_type]
     )
 
 with col2:
     ad_style = st.selectbox(
         "Ad Style",
-        ["Funny", "Technical", "Educational", "Promotional", "Problem-Solution"]
+        [opt["Style"] for opt in options if opt["PartType"] == part_type]
     )
     platform = st.selectbox(
         "Social Media Platform",
-        ["Instagram", "Facebook", "Twitter/X", "LinkedIn", "TikTok"]
+        [opt["Platform"] for opt in options if opt["PartType"] == part_type]
     )
-    max_length = st.slider("Maximum Ad Length (characters)", 50, 500, 275)
+    max_length = st.slider("Maximum Ad Length (characters)", 50, 500, options[0]["Max Length"])
 
 # Advanced Options (collapsible)
 with st.expander("Advanced Options"):
