@@ -48,12 +48,12 @@ st.markdown("Transform your basic emails into professional, warm, and personaliz
 # Sidebar for OpenAI API settings
 st.sidebar.title("OpenAI API Settings")
 
-# Get API key from user input
+# Get API key from environment variable or ask user
 secret_value = os.getenv("OwadmasdujU")
 if not secret_value:
-    api_key = st.sidebar.text_input("Enter OpenAI API Key:", type="password")
+    api_key = st.text_input("Enter your API key:", type="password")
 else:
-    api_key = st.sidebar.text_input("Enter OpenAI API Key:", type="password", value=secret_value)
+    api_key = secret_value
 
 # Model selection
 model_name = st.sidebar.selectbox(
