@@ -165,9 +165,11 @@ st.title("Automotive Ad Generator")
 st.markdown("Create engaging social media ads for automotive parts using AI")
 
 # Get API key from environment variable or ask user
-api_key = os.getenv("OwadmasdujU")
-if not api_key:
-    api_key = st.sidebar.text_input("Enter your OpenAI API key:", type="password")
+secret_value = os.getenv("OwadmasdujU")
+if not secret_value:
+    api_key = st.text_input("Enter your API key:", type="password")
+else:
+    api_key = secret_value
 
 # Part information input
 st.header("Ad Information")
