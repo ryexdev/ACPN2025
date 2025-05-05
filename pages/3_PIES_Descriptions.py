@@ -248,6 +248,10 @@ if generate_button and product_info.get("product_category"):
             description = generate_description(
                 prompt, model_source, model_name, ollama_url=ollama_url
             )
+
+        # Remove invalid characters
+        for char in pies_prompt_builder.invalid_characters:
+            description = description.replace(char, "")
         
         if description:
             # Store in session state
