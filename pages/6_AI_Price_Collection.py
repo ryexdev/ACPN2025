@@ -13,6 +13,13 @@ st.markdown("Collect prices for auto parts across multiple retailers using AI")
 # Get API key from environment variable or ask user
 open_ai_api_key = os.getenv("OwadmasdujU")
 
+# Model selection
+model_name = st.sidebar.selectbox(
+    "Select OpenAI Model:", 
+    ["gpt-4.1-nano", "gpt-4o-mini"],
+    index=0
+)
+
 def search_openai_for_price(part_number, retailer_site, part_type):
     # Create a container for logs
     log_container = st.expander("API Request and Response Logs", expanded=False)
@@ -36,7 +43,7 @@ def search_openai_for_price(part_number, retailer_site, part_type):
         
         # Using the responses API with web_search_preview tool
         response = client.responses.create(
-            model="gpt-4o",
+            model=model_name,
             input=[
                 {
                     "role": "system",
