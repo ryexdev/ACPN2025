@@ -107,44 +107,138 @@ def search_openai_for_price(part_number, retailer_site, part_type):
             st.error(f"Full error details: {repr(e)}")
         return f"Error: {str(e)}"
 
-# Create a form for user input
-with st.form(key="search_form"):
-    # Input for part number
-    part_number = st.text_input("Enter Part Number", placeholder="Example: 22A")
-    part_type = st.text_input("Enter Part Type", placeholder="Example: Wiper Blade")
-    
-    # Dropdown for store selection
-    store_options = [
-        "AutoZone",
-        "Advanced Auto Parts",
-        "O'Reillys", 
-        "Napa",
-        "RockAuto"
-    ]
-    selected_store = st.selectbox("Select Retailer", options=store_options)
-    
-    # Search button
-    search_button = st.form_submit_button("Search")
+# Product Options
+product_options = [
+    {"store_name": "AutoZone", "retailer_site": "autozone.com", "part_type": "Wiper Blade", "part_number": "22A"},
+    {"store_name": "Advanced Auto Parts", "retailer_site": "advancedautoparts.com", "part_type": "Wiper Blade", "part_number": "22A"},
+    {"store_name": "Carparts", "retailer_site": "carparts.com", "part_type": "Wiper Blade", "part_number": "22A"},
+    {"store_name": "O'Reillys", "retailer_site": "oreillyauto.com", "part_type": "Wiper Blade", "part_number": "22A"},
+    {"store_name": "Napa", "retailer_site": "napaonline.com", "part_type": "Wiper Blade", "part_number": "22A"},
+    {"store_name": "RockAuto", "retailer_site": "rockauto.com", "part_type": "Wiper Blade", "part_number": "22A"},
 
-    if search_button:
-        if part_number and selected_store and part_type:
-            if selected_store == "AutoZone":
-                retailer_site = "autozone.com"
-            elif selected_store == "Advanced Auto Parts":
-                retailer_site = "advancedautoparts.com"
-            elif selected_store == "O'Reillys":
-                retailer_site = "oreillyauto.com"
-            elif selected_store == "Napa":
-                retailer_site = "napaonline.com"
-            elif selected_store == "RockAuto":
-                retailer_site = "rockauto.com"
+    {"store_name": "Advanced Auto Parts", "retailer_site": "advancedautoparts.com", "part_type": "Brake Caliper", "part_number": "18-B4729"},
+    {"store_name": "AutoZone", "retailer_site": "autozone.com", "part_type": "Brake Caliper", "part_number": "18-B4729"},
+    {"store_name": "O'Reillys", "retailer_site": "oreillyauto.com", "part_type": "Brake Caliper", "part_number": "18-B4729"},
+    {"store_name": "Carparts", "retailer_site": "carparts.com", "part_type": "Brake Caliper", "part_number": "18-B4729"},
+    {"store_name": "Napa", "retailer_site": "napaonline.com", "part_type": "Brake Caliper", "part_number": "18-B4729"},
+    {"store_name": "RockAuto", "retailer_site": "rockauto.com", "part_type": "Brake Caliper", "part_number": "18-B4729"},
 
+    {"store_name": "Advanced Auto Parts", "retailer_site": "advancedautoparts.com", "part_type": "Air Suspension", "part_number": "949-852"},
+    {"store_name": "AutoZone", "retailer_site": "autozone.com", "part_type": "Air Suspension", "part_number": "949-852"},
+    {"store_name": "O'Reillys", "retailer_site": "oreillyauto.com", "part_type": "Air Suspension", "part_number": "949-852"},
+    {"store_name": "Carparts", "retailer_site": "carparts.com", "part_type": "Air Suspension", "part_number": "949-852"},
+    {"store_name": "Napa", "retailer_site": "napaonline.com", "part_type": "Air Suspension", "part_number": "949-852"},
+    {"store_name": "RockAuto", "retailer_site": "rockauto.com", "part_type": "Air Suspension", "part_number": "949-852"},
+
+    {"store_name": "AutoZone", "retailer_site": "autozone.com", "part_type": "Oil Filter", "part_number": "S8A"},
+    {"store_name": "O'Reillys", "retailer_site": "oreillyauto.com", "part_type": "Air Filter", "part_number": "49250"},
+    {"store_name": "Carparts", "retailer_site": "carparts.com", "part_type": "Brake Pads", "part_number": "TXH1308"},
+    {"store_name": "RockAuto", "retailer_site": "rockauto.com", "part_type": "Oil Filter", "part_number": "51515"},
+    {"store_name": "Napa", "retailer_site": "napaonline.com", "part_type": "Oil Filter", "part_number": "7356"},
+    {"store_name": "RockAuto", "retailer_site": "rockauto.com", "part_type": "Ignition Coil", "part_number": "FD503"} 
+]
+
+# Initialize session state variables if they don't exist
+if 'part_number' not in st.session_state:
+    st.session_state.part_number = None
+if 'part_type' not in st.session_state:
+    st.session_state.part_type = None
+if 'selected_store' not in st.session_state:
+    st.session_state.selected_store = None
+if 'reset_values' not in st.session_state:
+    st.session_state.reset_values = False
+
+# Get unique part numbers to avoid duplicates in the dropdown
+unique_part_numbers = list(set(option["part_number"] for option in product_options))
+
+# Callback for part number change
+def on_part_number_change():
+    # Get the selected part number
+    selected_part_number = st.session_state.part_number_select
+    
+    # Reset part type and store selection when part number changes
+    st.session_state.part_number = selected_part_number
+    st.session_state.part_type = None
+    st.session_state.selected_store = None
+    st.session_state.reset_values = True
+    
+# Callback for part type change
+def on_part_type_change():
+    # Get the selected part type
+    selected_part_type = st.session_state.part_type_select
+    
+    # Update part type in session state and reset store selection
+    st.session_state.part_type = selected_part_type
+    st.session_state.selected_store = None
+
+# Outside the form, select part number
+part_number = st.selectbox(
+    "Select Part Number", 
+    options=unique_part_numbers, 
+    key="part_number_select",
+    on_change=on_part_number_change
+)
+
+# Get valid part types for the selected part number
+valid_part_types = list(set(option["part_type"] for option in product_options if option["part_number"] == part_number))
+if valid_part_types:
+    # Set default part type if needed
+    if st.session_state.reset_values or st.session_state.part_type not in valid_part_types:
+        st.session_state.part_type = valid_part_types[0]
+        st.session_state.reset_values = False
+    
+    # Select part type
+    part_type = st.selectbox(
+        "Select Part Type", 
+        options=valid_part_types, 
+        index=valid_part_types.index(st.session_state.part_type) if st.session_state.part_type in valid_part_types else 0,
+        key="part_type_select",
+        on_change=on_part_type_change
+    )
+    
+    # Get valid retailers for the selected part number and part type
+    valid_retailers = list(set(option["store_name"] for option in product_options 
+                            if option["part_number"] == part_number and option["part_type"] == part_type))
+    
+    if valid_retailers:
+        # Set default retailer if needed
+        if st.session_state.selected_store not in valid_retailers:
+            st.session_state.selected_store = valid_retailers[0]
+        
+        # Select retailer
+        selected_store = st.selectbox(
+            "Select Retailer", 
+            options=valid_retailers,
+            index=valid_retailers.index(st.session_state.selected_store) if st.session_state.selected_store in valid_retailers else 0,
+            key="retailer_select"
+        )
+        
+        # Update session state
+        st.session_state.selected_store = selected_store
+    else:
+        st.warning("No retailers available for the selected part number and part type.")
+        selected_store = None
+else:
+    st.warning("No part types available for the selected part number.")
+    part_type = None
+    selected_store = None
+
+# Search button
+if st.button("Search", key="search_button"):
+    if part_number and selected_store and part_type:
+        # Get retailer site based on selected options
+        filtered_retailer_site = next((option["retailer_site"] for option in product_options 
+                                    if option["part_number"] == part_number 
+                                    and option["part_type"] == part_type 
+                                    and option["store_name"] == selected_store), "")
+        
+        if filtered_retailer_site:
             # Show searching notification
             with st.spinner(''):
                 search_status = st.success("🔍 Searching for price information...")
                 
                 # Get price information
-                price = search_openai_for_price(part_number, retailer_site, part_type)
+                price = search_openai_for_price(part_number, filtered_retailer_site, part_type)
                 
                 # Remove the searching notification
                 search_status.empty()
@@ -152,4 +246,6 @@ with st.form(key="search_form"):
                 # Show the results
                 st.write("### Results:")
                 st.success(price)
+        else:
+            st.error("Could not find retailer site for the selected options.")
 
