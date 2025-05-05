@@ -3,3 +3,7 @@ openai
 ollama
 pandas
 requests
+python-pptx
+matplotlib
+seaborn
+xlsxwriter
