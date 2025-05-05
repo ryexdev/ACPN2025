@@ -15,6 +15,13 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Model selection
+model_name = st.sidebar.selectbox(
+    "Select OpenAI Model:", 
+    ["gpt-4.1-nano", "gpt-4o-mini"],
+    index=0
+)
+
 # Custom CSS for better styling
 st.markdown("""
 <style>
@@ -263,8 +270,7 @@ Do not include any text in the image."""
     st.markdown("#### Model Settings")
     openai_model = st.selectbox(
         "OpenAI Model",
-        ["gpt-4.1-nano", "gpt-4o-mini", "gpt-3.5-turbo"],
-        index=1
+        options=model_name
     )
     os.environ['OPENAI_MODEL'] = openai_model
     
@@ -298,7 +304,7 @@ def generate_ad_text(part_type, brand, ad_style, platform, target_audience, max_
     }
     
     payload = {
-        "model": os.getenv('OPENAI_MODEL', "gpt-4.1-nano"),
+        "model": os.getenv('OPENAI_MODEL', model_name),
         "messages": [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
