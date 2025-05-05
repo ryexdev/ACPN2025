@@ -1,6 +1,7 @@
 
 class PIES_Prompt_Builder:
     def __init__(self):
+        self.invalid_characters = ['<', '>', '&', '"', "'", '`', '#', '*', '_', '^', '~', '|', ':', ';', '/', '\\', '@', '$', '%', '+', '=', '{', '}', '[', ']', '(', ')']
         pass
 
     def get_pies_description_codes(self):
@@ -109,6 +110,7 @@ class PIES_Prompt_Builder:
         # Set max length based on description type
         max_lengths = self.get_pies_description_max_lengths()
         max_length = max_lengths.get(description_type, 255)
+        adjusted_max_length = max_length - (max_length * 0.1)
         
         # Build the base prompt
         prompt = f"""You are a professional automotive aftermarket content writer specializing in PIES-compliant product descriptions. It is extremely IMPORTANT that you should make sure that the description is not longer than {max_length} characters.
@@ -135,153 +137,185 @@ class PIES_Prompt_Builder:
         # Add specific instructions based on description type
         # TODO: Clean up to be more dynamic and not hardcoded
         if description_type == "SHORT_DESC":
-            prompt += """
+            prompt += f"""
 For this SHORT DESCRIPTION:
 1. Create a brief label for quick product identification
-2. Be extremely concise (ideally under 80 characters)
+2. Be extremely concise (under {adjusted_max_length} characters)
 3. Focus only on the most essential information
 4. Use abbreviated terms common in the automotive industry when necessary
+5. Do not include any fitment information
         """
         elif description_type == "FIT_SUMMARY":
-            prompt += """
+            prompt += f"""
 For this FITMENT SUMMARY:
-1. Provide a basic summary of general fitment details
-2. Include compatible years, makes, and models
-3. Keep it concise and focused on primary applications
-4. Do not include detailed fitment data that would be in ACES
+1. Provide a basic summary of compatible years, makes, and models
+2. Keep it concise and focused on primary applications
+3. Example: "2018-2022 Mitsubishi Outlander Sport (Liter: 2.0, 2.4 & Cylinder: 4 & Block: L); 2017-2019 Mitsubishi RVR (Liter: 2.0, 2.4 & Cylinder: 4 & Block: L); 2018 Mitsubishi Outlander PHEV (Liter: 2.0 & Cylinder: 4 & Block: L); 2014-2019 Mitsubishi Outlander (Liter: 2.4 & Cylinder: 4 & Block: L)"
+4. Do not include any other product detailed
+5. Be extremely concise (under {adjusted_max_length} characters)
         """
         elif description_type == "USER_WARNING":
-            prompt += """
+            prompt += f"""
 For this USER WARNING:
 1. Create clear safety alerts or caution messages
 2. Use direct, unambiguous language about potential hazards
 3. Format as bullet points or simple statements
 4. Focus on critical safety information the user must know
+5. Be extremely concise (under {adjusted_max_length} characters)
+6. Do not include any fitment information
         """
         elif description_type == "FULL_DESC":
-            prompt += """
+            prompt += f"""
 For this FULL DESCRIPTION:
 1. Provide a complete description of what the product is
 2. Include comprehensive details about features, materials, and purpose
 3. Use professional, technical language appropriate for the industry
 4. Create a thorough but concise explanation of the part
+5. Be extremely concise (under {adjusted_max_length} characters)
+6. Do not include any fitment information
             """
         elif description_type == "EXTENDED_DESC":
-            prompt += """
+            prompt += f"""
 For this EXTENDED DESCRIPTION:
 1. Create a detailed, extended overview of the product
 2. Include comprehensive information about features, benefits, and applications
 3. Use professional terminology with thorough explanations
 4. Provide more depth than the standard description
+5. Be extremely concise (under {adjusted_max_length} characters)
+6. Do not include any fitment information
             """
         elif description_type == "FEATURE_BENEFIT":
-            prompt += """
+            prompt += f"""
 For this FEATURE/BENEFIT:
 1. Highlight a specific feature and its direct benefit to the customer
 2. Use clear cause-and-effect language (e.g., "Precision-engineered for longer service life")
 3. Focus on what differentiates this part from competitors
 4. Emphasize value to the customer
+5. Be extremely concise (under {adjusted_max_length} characters)
+6. Do not include any fitment information
             """
         elif description_type == "IMPORTANT_INFO":
-            prompt += """
+            prompt += f"""
 For this IMPORTANT INFORMATION:
 1. Provide critical notes for consumers and technicians
 2. Focus on non-safety information that's still essential to know
 3. Use clear, direct language
 4. Include information that affects usage, performance, or installation
+5. Be extremely concise (under {adjusted_max_length} characters)
+6. Do not include any fitment information
             """
         elif description_type == "INSTALL_GUIDE":
-            prompt += """
+            prompt += f"""
 For this INSTALLATION GUIDE:
 1. Provide helpful guidance or tips for installing the product
 2. Include practical advice to avoid common installation problems
 3. Mention any special tools or precautions needed
 4. Keep instructions concise and focused on key points
+5. Be extremely concise (under {adjusted_max_length} characters)
+6. Do not include any fitment information
             """
         elif description_type == "INVOICE_DESC":
-            prompt += """
+            prompt += f"""
 For this INVOICE DESCRIPTION:
 1. Create a clear, concise description for invoices
 2. Include essential identifying information about the part
 3. Use standard industry terminology
 4. Focus on what's needed for accurate billing and inventory
+5. Be extremely concise (under {adjusted_max_length} characters)
+6. Do not include any fitment information
             """
         elif description_type == "SEARCH_TERMS":
-            prompt += """
+            prompt += f"""
 For this SEARCH TERMS:
 1. Provide keywords that improve online search visibility
 2. Include industry slang or common alternative terms
 3. Focus on terms customers might use when searching
 4. Keep each term relevant and specific to the product
+5. Be extremely concise (under {adjusted_max_length} characters)
+6. Do not include any fitment information
             """
         elif description_type == "LABEL_TEXT":
-            prompt += """
+            prompt += f"""
 For this LABEL TEXT:
 1. Create a short description for packaging or shelf/bin identification
 2. Be extremely concise while maintaining clarity
 3. Include only the most essential identifying information
 4. Use standard industry terminology
+5. Be extremely concise (under {adjusted_max_length} characters)
+6. Do not include any fitment information
             """
         elif description_type == "MARKETING_COPY":
-            prompt += """
+            prompt += f"""
 For this MARKETING COPY:
 1. Create compelling, persuasive content for web pages
 2. Highlight key features, benefits, and unique selling points
 3. Use engaging language that appeals to customers
 4. Focus on what makes this part a good purchase decision
+5. Be extremely concise (under {adjusted_max_length} characters)
+6. Do not include any fitment information
             """
         elif description_type == "CONDENSED_DESC":
-            prompt += """
+            prompt += f"""
 For this CONDENSED DESCRIPTION:
 1. Create a shortened product description for space-limited contexts
 2. Include only the most important features and specifications
 3. Use concise, efficient language
 4. Maintain clarity while being extremely brief
+5. Be extremely concise (under {adjusted_max_length} characters)
+6. Do not include any fitment information
             """
         elif description_type == "ALT_NAMES":
-            prompt += """
+            prompt += f"""
 For this ALTERNATE NAMES:
 1. Provide alternate names or search-friendly terms for the product
 2. Include common industry variations in terminology
 3. Focus on terms customers might use when searching
 4. Keep each term accurate and relevant
+5. Be extremely concise (under {adjusted_max_length} characters)
+6. Do not include any fitment information
             """
         elif description_type == "TITLE_DESC":
-            prompt += """
+            prompt += f"""
 For this TITLE DESCRIPTION:
 1. Create an SEO-focused description combining product name with key attributes
 2. Format for optimal online search results
 3. Include the most important specifications or features
 4. Keep it concise but comprehensive for search purposes
+5. Be extremely concise (under {adjusted_max_length} characters)
+6. Do not include any fitment information
             """
         elif description_type == "TECH_TIP_INTRO":
-            prompt += """
+            prompt += f"""
 For this TECHNICAL TIP INTRODUCTION:
 1. Create an introductory paragraph for technical tips
 2. Set the context for why these tips are important
 3. Use professional, knowledgeable language
 4. Prepare the reader for the detailed tips that will follow
+5. Be extremely concise (under {adjusted_max_length} characters)
+6. Do not include any fitment information
             """
         elif description_type == "TECH_TIP_DETAIL":
-            prompt += """
+            prompt += f"""
 For this TECHNICAL TIP DETAIL:
 1. Provide a specific technical tip for working with the product
 2. Offer practical advice or best practices
 3. Use clear, instructional language
 4. Focus on helping technicians or DIY customers succeed with the part
+5. Be extremely concise (under {adjusted_max_length} characters)
+6. Do not include any fitment information
             """
         
         # Add PIES compliance instructions
-        prompt += """
+        prompt += f"""
 PIES XML COMPLIANCE REQUIREMENTS:
 1. Do not include HTML or XML tags in your description
-2. IMPORTANT: Must NOT include special characters like <, >, &, ", ', `, #, *, _, ^, ~, |, :, ;, /, \, @, $, %, +, -, =, {, }, [, ], (. Do not include line breaks in your description.
+2. IMPORTANT: Must NOT include special characters like {', '.join(self.invalid_characters)}. Do not include line breaks in your description.
 3. Do not include marketing slogans or excessive capitalization
 4. Focus on factual, specific information about the part
 5. Respond with ONLY the description text, nothing else
         """
         # Add character limit instruction
-        prompt += f"\nIMPORTANT: Maximum length is {max_length} characters. Do not exceed this limit."
+        prompt += f"\nIMPORTANT: Maximum length is {adjusted_max_length} characters. Do not exceed this limit."
 
         return prompt 
 
