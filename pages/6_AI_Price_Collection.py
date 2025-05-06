@@ -16,7 +16,7 @@ open_ai_api_key = os.getenv("OwadmasdujU")
 # Model selection
 model_name = st.sidebar.selectbox(
     "Select OpenAI Model:", 
-    ["gpt-4.1-nano", "gpt-4o-mini"],
+    ["gpt-4o"],
     index=0
 )
 
