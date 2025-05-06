@@ -1,8 +1,6 @@
 import streamlit as st
 import os
 import pandas as pd
-import time
-
 from classes.utils.pies_prompt_builder import pies_prompt_builder
 from classes.ai_engines.openai_client import openai_client
 from classes.db import db
@@ -14,7 +12,7 @@ st.set_page_config(
     layout="wide"
 )
 
-st.info("🤖💬 Generate PIES-compliant product descriptions for auto parts using AI (GPT-4.1-Nano)!")
+st.info("🤖💬 Generate PIES-compliant product descriptions")
 
 # Database connection
 def get_db_connection():
@@ -40,18 +38,17 @@ if not secret_value:
     api_key = st.text_input("Enter your API key:", type="password")
 else:
     api_key = secret_value
-    st.success("✅ API key loaded from environment")
 
 # Part info entry
 st.subheader("Part Information")
-input_mode = st.radio("Select input mode:", ["Select from Database", "Enter Manually"])
+input_mode = st.radio("Select input mode:", ["Enter Manually", "Select from Database"])
 product_info = {}
 
 if input_mode == "Select from Database":
     conn = get_db_connection()
     if conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT part_number, product_category, brand FROM parts LIMIT 100")
+        cursor.execute("SELECT part_number, product_category, brand FROM parts LIMIT 10")
         parts = cursor.fetchall()
 
         if parts:
