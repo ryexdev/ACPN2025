@@ -31,8 +31,7 @@ def generate_description(prompt, api_key=None):
         st.error(f"Error generating description: {e}")
         return None
 
-# In-page API key prompt (not in sidebar)
-st.subheader("API Key Configuration")
+# API key entry
 secret_value = os.getenv("OwadmasdujU")
 if not secret_value:
     api_key = st.text_input("Enter your API key:", type="password")

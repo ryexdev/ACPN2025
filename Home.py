@@ -9,32 +9,8 @@ initialize_database.InitializeDatabase().create_database()
 st.set_page_config(
     page_title="Ryan²", 
     layout="wide",
-    page_icon="🚗"
+    page_icon="🚗❤️🤖"
 )
-
-# Function to fetch the OpenAI status
-def get_openai_status():
-    try:
-        response = requests.get("https://status.openai.com/proxy/status.openai.com")
-        if response.status_code == 200:
-            status_data = response.json()
-            
-            # Find the Chat API component in the APIs group
-            for item in status_data["summary"]["structure"]["items"]:
-                if "group" in item:
-                    group = item["group"]
-                    if group["name"] == "APIs":
-                        for component in group["components"]:
-                            if component["name"] == "Chat":
-                                return {
-                                    "status": "Operational" if component.get("hidden") == False else "Issue Detected"
-                                }
-            
-            return {"status": "Unknown"}
-        else:
-            return {"status": "Error"}
-    except Exception as e:
-        return {"status": "Error"}
 
 # Title
 st.title("Ryan² ACPN 2025 Demo 🚗❤️🤖")
@@ -103,14 +79,3 @@ Feel free to reach out to either Ryan with any questions!
 [Ryan Henderson](https://www.linkedin.com/in/ryan-andrew-henderson/)
          
 We've open sourced this project on GitHub. [You can find the code here.](https://github.com/ryexdev/ACPN2025)""")
-# Get OpenAI API status
-api_status = get_openai_status()
-status_class = "status-operational" if api_status["status"] == "Operational" else "status-issue" if api_status["status"] == "Issue Detected" else "status-error"
-
-# Display the status at the bottom
-st.markdown(f"""
-<div class="status-container">
-    <div class="status-indicator {status_class}"></div>
-    OpenAI Chat API: {api_status["status"]}
-</div>
-""", unsafe_allow_html=True)
