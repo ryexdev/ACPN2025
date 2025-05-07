@@ -3,30 +3,117 @@ import os
 import json
 import pandas as pd
 import requests
+import time
 
-# Import utility functions
+ollama_inactive = True
+model_source = "OpenAI"
+model_name = "gpt-4.1-nano"
+
+#---------------- Header with API control --------------
+pagename = "PIES Description Builder"
+pageicon = "📑"
+st.set_page_config(page_title=pagename, layout="wide",page_icon=pageicon)
+st.subheader(f"{pageicon} {pagename}")
+with st.expander(f"Description of {pagename}", expanded=False):
+    st.markdown(f"""
+This tool helps you generate professional product descriptions that comply with Auto Care PIES (Product Information Exchange Standard) requirements using AI technology.
+
+You can:
+- Connect to either OpenAI or Ollama language models { "<i>(Ollama deactivated for demo)</i>" if ollama_inactive else "OpenAI" }
+- Select parts from an existing database or enter new part details manually  
+- Generate accurate, standardized descriptions for automotive parts and components
+- Save generated descriptions for future reference
+
+The AI models are specifically tuned to create consistent, detailed product descriptions following PIES formatting guidelines and automotive industry best practices.
+""", unsafe_allow_html=True)
+#API Key Control
+if 'openai_api_key' not in st.session_state:
+    st.session_state['openai_api_key'] = None
+secret_value = os.getenv("OwadmasdujU")
+if secret_value:
+    st.success("OpenAI API key has been provided until EOD 5/14/2025")
+    api_key = secret_value
+    st.session_state['openai_api_key'] = secret_value
+elif st.session_state['openai_api_key']:
+    col1, col2 = st.columns([5, 1])
+    with col1:
+        st.success("Using user-provided OpenAI API key")
+    with col2:
+        if st.button("Clear Key", type="secondary", use_container_width=True):
+            st.session_state['openai_api_key'] = None
+            st.rerun()
+    api_key = st.session_state['openai_api_key']
+else:
+    with st.container(border=True):
+        st.warning("Please enter your [OpenAI API key](https://openai.com/api/).")
+        api_key_input = st.text_input("Enter your API key:", type="password")
+        if api_key_input:
+            st.session_state['openai_api_key'] = api_key_input
+        api_key = st.session_state['openai_api_key']
+
+st.divider()
+#-----------------------------------------------------------
+
+# Create a placeholder for the database loading message
+loading_placeholder = st.empty()
+# Show a very prominent loading message with large text and emoji
+loading_placeholder.markdown("""
+    <div style="text-align: center; padding: 50px; border-radius: 10px; margin: 20px 0;">
+        <h1 style="color: #0066cc;">🔄 Demo Database Initialization</h1>
+        <h3>Please wait while the database is being checked or initialized...</h3>
+        <p>This may take a few moments if this is the first time running the application.</p>
+    </div>
+""", unsafe_allow_html=True)
+
+# Import utility functions - doing imports after showing loading message
 from classes.utils.pies_prompt_builder import pies_prompt_builder
 from classes.ai_engines.openai_client import openai_client
 from classes.ai_engines.ollama_client import ollama_client
 from classes.db import db
-
-# Ollama API key (Check README.md for more information)
-secret_value = os.getenv("OwadmasdujU")
-model_source = "OpenAI"
-model_name = "gpt-4.1-nano"
+from classes.db.initalize_database import initialize_database
 
 # Disable Ollama option for the demo
 # Look at the README.md file for more information
 ollama_inactive = True
 
+# Database initialization
+db_initialized = False
+# Check if database exists, if not create it
+db_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'classes', 'db', 'pies.db')
+if not os.path.exists(db_path):
+    loading_placeholder.markdown("""
+        <div style="text-align: center; padding: 50px; border-radius: 10px; margin: 20px 0;">
+            <h1 style="color: #FF9900;">⚙️ Creating Demo Database</h1>
+            <h3>The demo database is being built with sample data...</h3>
+            <p>This operation might take a minute. Please be patient.</p>
+        </div>
+    """, unsafe_allow_html=True)
+    # Create the database
+    initialize_database.create_database()
+    db_initialized = True
 
-# Page configuration
-st.set_page_config(
-    page_title="PIES Description Builder",
-    page_icon="📑",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+# Verify database connection
+if not db.connection_status():
+    loading_placeholder.markdown("""
+        <div style="text-align: center; padding: 50px; border-radius: 10px; margin: 20px 0;">
+            <h1 style="color: #d32f2f;">❌ Demo Database Error</h1>
+            <h3>Could not connect to the demo database.</h3>
+            <p>Some features may not work properly. Please check the logs for more information.</p>
+        </div>
+    """, unsafe_allow_html=True)
+else:
+    if db_initialized:
+        loading_placeholder.markdown("""
+            <div style="text-align: center; padding: 50px; border-radius: 10px; margin: 20px 0;">
+                <h1 style="color: #2e7d32;">✅ DemoDatabase Ready</h1>
+                <h3>DemoDatabase has been successfully initialized!</h3>
+                <p>You can now use all features of the application.</p>
+            </div>
+        """, unsafe_allow_html=True)
+        time.sleep(2)  # Give users time to see the success message
+
+# Clear the loading message after database operations are complete
+loading_placeholder.empty()
 
 # Function to generate PIES description
 def generate_description(prompt, model_source, model_name, api_key=None, ollama_url=None):
@@ -43,31 +130,7 @@ def generate_description(prompt, model_source, model_name, api_key=None, ollama_
         st.error(f"Error generating description: {e}")
         return None
 
-
-# Main application
-st.title("📑 PIES Description Builder")
-with st.expander("Description of PIES Description Builder", expanded=True):
-    st.markdown(f"""
-    This tool helps you generate professional product descriptions that comply with Auto Care PIES (Product Information Exchange Standard) requirements using AI technology.
-
-    You can:
-    - Connect to either OpenAI or Ollama language models { "<i>(Ollama deactivated for demo)</i>" if ollama_inactive else "OpenAI" }
-    - Select parts from an existing database or enter new part details manually  
-    - Generate accurate, standardized descriptions for automotive parts and components
-    - Save generated descriptions for future reference
-
-    The AI models are specifically tuned to create consistent, detailed product descriptions following PIES formatting guidelines and automotive industry best practices.
-    """, unsafe_allow_html=True)
-
-if not secret_value:
-    with st.container(border=True):
-        st.subheader("OpenAI API Key")
-        st.warning("API key is not set. Please enter your API key below to continue to use the tool.")
-        api_key = st.text_input("Enter your API key:", type="password")
-else:
-    st.success("OpenAI API key has been provided for the demo. You can freely use the tool until the API key expires (estimated 2025-05-14 @ 12:00 MST).")
-    api_key = secret_value
-
+# LLM Connection Configuration
 if not ollama_inactive:
     with st.expander("LLM Connection Configuration"):
         st.write("This section allows you to configure the connection to the LLM (Large Language Model). You can choose between OpenAI and Ollama as your LLM provider. If you choose OpenAI, you need to provide your API key. If you choose Ollama, you need to provide the URL of the Ollama server.")
