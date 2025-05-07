@@ -7,6 +7,11 @@ import base64
 from PIL import Image
 import random
 
+# Get API key from environment variable or ask user
+# secret_value = None
+secret_value = os.getenv("OwadmasdujU")
+model_name = "gpt-4.1-nano"
+
 # Configure page settings
 st.set_page_config(
     page_title="Automotive Ad Generator",
@@ -15,20 +20,12 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Model selection
-model_name = st.sidebar.selectbox(
-    "Select OpenAI Model:", 
-    ["gpt-4.1-nano", "gpt-4o-mini"],
-    index=0
-)
-
 # Custom CSS for better styling
 st.markdown("""
 <style>
     .ad-preview {
         padding: 20px;
         border-radius: 10px;
-        /*background-color: #f0f2f0;*/
         margin: 20px 0;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -36,11 +33,6 @@ st.markdown("""
     .hashtags {
         color: #1DA1F2;
         font-weight: 500;
-    }
-    .ad-image {
-        max-width: 100%;
-        border-radius: 8px;
-        margin: 15px 0;
     }
     .platform-header {
         display: flex;
@@ -77,7 +69,6 @@ st.markdown("""
         border: 1px solid #e1e8ed;
         border-radius: 8px;
         overflow: hidden;
-        /*background-color: #f3f6f8;*/
     }
     .tiktok-post {
         border: 1px solid #e1e8ed;
@@ -95,7 +86,6 @@ st.markdown("""
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        /*background-color: #e1e8ed;*/
         margin-right: 12px;
         display: flex;
         align-items: center;
@@ -141,46 +131,34 @@ st.markdown("""
         padding: 15px;
         color: white;
     }
-    .preview-image {
-        max-height: 350px;
-        width: auto;
-        max-width: 100%;
-        margin: 0 auto;
-        display: block;
-    }
-    .image-container {
-        text-align: center;
-        position: relative;
-    }
-    .image-expand {
-        position: absolute;
-        bottom: 10px;
-        right: 10px;
-        background: rgba(0,0,0,0.5);
-        color: white;
-        border-radius: 4px;
-        padding: 5px 10px;
-        font-size: 12px;
-        cursor: pointer;
-        z-index: 100;
-    }
 </style>
 """, unsafe_allow_html=True)
 
 # Main title
 st.title("Automotive Ad Generator")
-st.markdown("Create engaging social media ads for automotive parts using AI")
+st.markdown("""
+Generate professional, platform-optimized social media ads for automotive parts and accessories. 
+This tool uses AI to create engaging ad copy tailored to different social platforms (Instagram, LinkedIn, Facebook, etc.), 
+target audiences, and marketing styles. The output includes customized ad text, suggested hashtags, and formatting 
+specific to each platform's best practices.
+""")
 
-# Get API key from environment variable or ask user
-secret_value = os.getenv("OwadmasdujU")
+# Get API key from environment variable or ask user to enter it
 if not secret_value:
-    api_key = st.text_input("Enter your API key:", type="password")
+    with st.container(border=True):
+        st.subheader("OpenAI API Key")
+        st.warning("API key is not set. Please enter your API key below to continue to use the tool.")
+        api_key = st.text_input("Enter your API key:", type="password")
+        model_name = st.selectbox(
+            "Select OpenAI Model:", 
+            ["gpt-4.1-nano", "gpt-4o-mini"],
+            index=0
+        )
 else:
+    st.success("OpenAI API key has been provided for the demo. You can freely use the tool until the API key expires (estimated 2025-05-14 @ 12:00 MST).")
     api_key = secret_value
 
-# Part information input
-st.header("Ad Information")
-
+# Example options for demonstration
 options = [
     {"PartType":"Ignition Coil", "Brand": "Bosch", "Style": "Funny", "Platform": "Instagram", "Audience": "DIY Mechanics", "Max Length": 375},
     {"PartType":"Mass Air Flow Sensor", "Brand": "United Motor Products", "Style": "Funny", "Platform": "LinkedIn", "Audience": "Professional Mechanics", "Max Length": 275},
@@ -192,29 +170,67 @@ options = [
     {"PartType":"Brake Line", "Brand": "Dorman", "Style": "Funny", "Platform": "TikTok", "Audience": "Car Enthusiasts", "Max Length": 450}
 ]
 
+st.divider()
+
+# Part information input
+st.header("Ad Information")
+st.write("This tool generates ad text for automotive parts and accessories. It uses AI to create engaging ad copy tailored to different social platforms (Instagram, LinkedIn, Facebook, etc.), target audiences, and marketing styles.")
+
+# Add radio button to toggle between example mode and manual mode
+input_mode = st.radio(
+    "Select Input Mode",
+    ["Use Examples", "Manual Input"],
+    horizontal=True
+)
+
 col1, col2 = st.columns(2)
 with col1:
-    part_type = st.selectbox("Automotive Part Type", options=[opt["PartType"] for opt in options],index=0)
-    brand = st.selectbox("Brand (optional)", options=[opt["Brand"] for opt in options if opt["PartType"] == part_type],index=0)
-    target_audience = st.selectbox(
-        "Target Audience",
-        [opt["Audience"] for opt in options if opt["PartType"] == part_type]
-    )
+    if input_mode == "Use Examples":
+        part_type = st.selectbox("Automotive Part Type", options=[opt["PartType"] for opt in options], index=0)
+        
+        # Get matching brand options for selected part type
+        matching_brands = [opt["Brand"] for opt in options if opt["PartType"] == part_type]
+        brand = st.selectbox(f"Brand (auto selected for `{part_type}`)", options=matching_brands, index=0)
+        
+        # Get matching audience options for selected part type
+        matching_audiences = [opt["Audience"] for opt in options if opt["PartType"] == part_type]
+        target_audience = st.selectbox(f"Target Audience (auto selected for `{part_type}`)", options=matching_audiences)
+    else:
+        part_type = st.text_input("Automotive Part Type", "")
+        brand = st.text_input("Brand (optional)", "")
+        target_audience = st.selectbox(
+            "Target Audience",
+            ["DIY Mechanics", "Professional Mechanics", "General Public", "Car Enthusiasts", "Educational", "Business Owners"]
+        )
 
 with col2:
-    ad_style = st.selectbox(
-        "Ad Style",
-        [opt["Style"] for opt in options if opt["PartType"] == part_type]
-    )
-    platform = st.selectbox(
-        "Social Media Platform",
-        [opt["Platform"] for opt in options if opt["PartType"] == part_type]
-    )
-    max_length = st.slider("Maximum Ad Length (characters)", 50, 500, options[0]["Max Length"])
+    if input_mode == "Use Examples":
+        # Get matching style options for selected part type
+        matching_styles = [opt["Style"] for opt in options if opt["PartType"] == part_type]
+        ad_style = st.selectbox(f"Ad Style (auto selected for `{part_type}`)", options=matching_styles)
+        
+        # Get matching platform options for selected part type
+        matching_platforms = [opt["Platform"] for opt in options if opt["PartType"] == part_type]
+        platform = st.selectbox(f"Social Media Platform (auto selected for `{part_type}`)", options=matching_platforms)
+        
+        # Get default max length from selected option
+        default_max_length = next((opt["Max Length"] for opt in options if opt["PartType"] == part_type and opt["Brand"] == brand), 300)
+        max_length = st.slider(f"Maximum Ad Length (characters) (auto selected for `{part_type}`)", 50, 500, default_max_length)
+    else:
+        ad_style = st.selectbox(
+            "Ad Style",
+            ["Funny", "Informative", "Professional", "Engaging", "Technical", "Emotional"]
+        )
+        platform = st.selectbox(
+            "Social Media Platform",
+            ["Instagram", "LinkedIn", "Facebook", "Twitter/X", "TikTok"]
+        )
+        max_length = st.slider(f"Maximum Ad Length (characters) (auto selected for `{part_type}`)", 50, 500, 300)
 
 # Advanced Options (collapsible)
 with st.expander("Advanced Options"):
     st.subheader("Customize Prompt Templates")
+    st.write("You can customize the prompt templates to generate ads that are more specific to your brand and audience.")
     
     # Default text prompt templates
     if 'text_system_prompt_template' not in st.session_state:
@@ -333,74 +349,21 @@ def generate_ad_text(part_type, brand, ad_style, platform, target_audience, max_
         st.error(f"Error generating ad text: {str(e)}")
         return None, None
 
-# Function to generate image based on ad text
-def generate_image(ad_text, part_type, platform):
-    platform_style = ""
-    if platform == "Instagram":
-        platform_style = "styled for Instagram with clean, bright aesthetics"
-    elif platform == "Facebook":
-        platform_style = "styled for Facebook with engaging, shareable visuals"
-    elif platform == "Twitter/X":
-        platform_style = "styled for Twitter with clear, attention-grabbing imagery"
-    elif platform == "LinkedIn":
-        platform_style = "styled for LinkedIn with professional, business-appropriate imagery"
-    elif platform == "TikTok":
-        platform_style = "styled for TikTok with vibrant, trendy visuals that appeal to younger audiences"
-    
-    # Use the custom image prompt template with variables replaced
-    image_prompt = st.session_state.image_prompt_template.format(
-        part_type=part_type,
-        platform_style=platform_style,
-        ad_text=ad_text
-    )
-    
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {api_key}"
-    }
-    
-    payload = {
-        "model": "dall-e-3",
-        "prompt": image_prompt,
-        "size": "1024x1024",
-        "quality": st.session_state.get('image_quality', 'standard'),
-        "n": 1
-    }
-    
-    try:
-        response = requests.post(
-            "https://api.openai.com/v1/images/generations",
-            headers=headers,
-            json=payload
-        )
-        response.raise_for_status()
-        image_url = response.json()['data'][0]['url']
-        
-        # Get the image data
-        image_response = requests.get(image_url)
-        image_response.raise_for_status()
-        
-        return image_response.content
-    
-    except Exception as e:
-        st.error(f"Error generating image: {str(e)}")
-        return None
-
 # Function to render platform-specific UI
-def render_platform_post(platform, brand, ad_text, hashtags, image_data):
+def render_platform_post(platform, brand, ad_text, hashtags):
     if platform == "Instagram":
-        render_instagram_post(brand, ad_text, hashtags, image_data)
+        render_instagram_post(brand, ad_text, hashtags)
     elif platform == "Facebook":
-        render_facebook_post(brand, ad_text, hashtags, image_data)
+        render_facebook_post(brand, ad_text, hashtags)
     elif platform == "Twitter/X":
-        render_twitter_post(brand, ad_text, hashtags, image_data)
+        render_twitter_post(brand, ad_text, hashtags)
     elif platform == "LinkedIn":
-        render_linkedin_post(brand, ad_text, hashtags, image_data)
+        render_linkedin_post(brand, ad_text, hashtags)
     elif platform == "TikTok":
-        render_tiktok_post(brand, ad_text, hashtags, image_data)
+        render_tiktok_post(brand, ad_text, hashtags)
 
 # Platform-specific post renderers
-def render_instagram_post(brand, ad_text, hashtags, image_data):
+def render_instagram_post(brand, ad_text, hashtags):
     brand_name = brand if brand else "AutoPartsCo"
     
     st.markdown(f"""
@@ -414,30 +377,6 @@ def render_instagram_post(brand, ad_text, hashtags, image_data):
                 <div class="timestamp">Sponsored</div>
             </div>
         </div>
-    """, unsafe_allow_html=True)
-    
-    # Display the image if available with controlled size
-    if image_data:
-        # Create a unique key for this session
-        if 'image_counter' not in st.session_state:
-            st.session_state.image_counter = 0
-        else:
-            st.session_state.image_counter += 1
-        
-        # Display smaller image in the preview
-        image = Image.open(io.BytesIO(image_data))
-        
-        # Create a container with relative positioning for the expand button
-        st.markdown('<div class="image-container">', unsafe_allow_html=True)
-        
-        # Show the image with controlled height (without key parameter)
-        st.image(image, use_container_width=False, clamp=True, output_format="PNG", 
-                 width=min(550, image.width))
-        
-        # Close the container
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    st.markdown(f"""
         <div class="post-content">
             <div class="post-text">{ad_text}</div>
             <div class="hashtags">{hashtags}</div>
@@ -451,7 +390,7 @@ def render_instagram_post(brand, ad_text, hashtags, image_data):
     </div>
     """, unsafe_allow_html=True)
 
-def render_facebook_post(brand, ad_text, hashtags, image_data):
+def render_facebook_post(brand, ad_text, hashtags):
     brand_name = brand if brand else "AutoPartsCo"
     
     st.markdown(f"""
@@ -465,24 +404,6 @@ def render_facebook_post(brand, ad_text, hashtags, image_data):
                 <div class="timestamp">Sponsored · <i class="fas fa-globe"></i></div>
             </div>
         </div>
-    """, unsafe_allow_html=True)
-    
-    # Display the image if available with controlled size
-    if image_data:
-        # Display smaller image in the preview
-        image = Image.open(io.BytesIO(image_data))
-        
-        # Create a container with relative positioning for the expand button
-        st.markdown('<div class="image-container">', unsafe_allow_html=True)
-        
-        # Show the image with controlled height (without key parameter)
-        st.image(image, use_container_width=False, clamp=True, output_format="PNG", 
-                 width=min(550, image.width))
-        
-        # Close the container
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    st.markdown(f"""
         <div class="post-content">
             <div class="post-text">{ad_text}</div>
             <div class="hashtags">{hashtags}</div>
@@ -495,7 +416,7 @@ def render_facebook_post(brand, ad_text, hashtags, image_data):
     </div>
     """, unsafe_allow_html=True)
 
-def render_twitter_post(brand, ad_text, hashtags, image_data):
+def render_twitter_post(brand, ad_text, hashtags):
     brand_name = brand if brand else "AutoPartsCo"
     username = brand_name.replace(" ", "")
     
@@ -513,24 +434,6 @@ def render_twitter_post(brand, ad_text, hashtags, image_data):
         <div class="post-content">
             <div class="post-text">{ad_text}</div>
             <div class="hashtags">{hashtags}</div>
-    """, unsafe_allow_html=True)
-    
-    # Display the image if available with controlled size
-    if image_data:
-        # Display smaller image in the preview
-        image = Image.open(io.BytesIO(image_data))
-        
-        # Create a container with relative positioning for the expand button
-        st.markdown('<div class="image-container">', unsafe_allow_html=True)
-        
-        # Show the image with controlled height (without key parameter)
-        st.image(image, use_container_width=False, clamp=True, output_format="PNG", 
-                 width=min(500, image.width))
-        
-        # Close the container
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    st.markdown(f"""
         </div>
         <div class="post-actions">
             <span class="action-button">💬 Reply</span>
@@ -541,7 +444,7 @@ def render_twitter_post(brand, ad_text, hashtags, image_data):
     </div>
     """, unsafe_allow_html=True)
 
-def render_linkedin_post(brand, ad_text, hashtags, image_data):
+def render_linkedin_post(brand, ad_text, hashtags):
     brand_name = brand if brand else "AutoPartsCo"
     
     st.markdown(f"""
@@ -558,24 +461,6 @@ def render_linkedin_post(brand, ad_text, hashtags, image_data):
         <div class="post-content">
             <div class="post-text">{ad_text}</div>
             <div class="hashtags">{hashtags}</div>
-    """, unsafe_allow_html=True)
-    
-    # Display the image if available with controlled size
-    if image_data:
-        # Display smaller image in the preview
-        image = Image.open(io.BytesIO(image_data))
-        
-        # Create a container with relative positioning for the expand button
-        st.markdown('<div class="image-container">', unsafe_allow_html=True)
-        
-        # Show the image with controlled height (without key parameter)
-        st.image(image, use_container_width=False, clamp=True, output_format="PNG", 
-                 width=min(500, image.width))
-        
-        # Close the container
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    st.markdown(f"""
         </div>
         <div class="post-actions">
             <span class="action-button">👍 Like</span>
@@ -586,7 +471,7 @@ def render_linkedin_post(brand, ad_text, hashtags, image_data):
     </div>
     """, unsafe_allow_html=True)
 
-def render_tiktok_post(brand, ad_text, hashtags, image_data):
+def render_tiktok_post(brand, ad_text, hashtags):
     brand_name = brand if brand else "AutoPartsCo"
     username = brand_name.replace(" ", "").lower()
     
@@ -601,24 +486,6 @@ def render_tiktok_post(brand, ad_text, hashtags, image_data):
                 <div class="timestamp" style="color: #aaa;">Sponsored</div>
             </div>
         </div>
-    """, unsafe_allow_html=True)
-    
-    # Display the image if available with controlled size
-    if image_data:
-        # Display smaller image in the preview
-        image = Image.open(io.BytesIO(image_data))
-        
-        # Create a container with relative positioning for the expand button
-        st.markdown('<div class="image-container">', unsafe_allow_html=True)
-        
-        # Show the image with controlled height - TikTok is more vertical (without key parameter)
-        st.image(image, use_container_width=False, clamp=True, output_format="PNG", 
-                 width=min(400, image.width))
-        
-        # Close the container
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    st.markdown(f"""
         <div class="post-content tiktok-content">
             <div class="post-text">{ad_text}</div>
             <div class="hashtags">{hashtags}</div>
@@ -631,39 +498,6 @@ def render_tiktok_post(brand, ad_text, hashtags, image_data):
     </div>
     """, unsafe_allow_html=True)
 
-# Store the enhanced download options in a function to avoid duplication and scope issues
-def display_download_options(image_data, ad_text, hashtags):
-    st.subheader("Download Options")
-    
-    # Image download
-    if image_data:
-        # Encode image to base64 for download
-        img_bytes = io.BytesIO(image_data)
-        b64 = base64.b64encode(img_bytes.getvalue()).decode()
-        
-        # Create a download link for the full-size image
-        st.markdown(f"""
-        <a href="data:image/png;base64,{b64}" download="ad_image.png" style="display: inline-block; padding: 0.5em 1em; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 4px; margin-bottom: 15px;">
-            <span style="vertical-align: middle;">⬇️ Download Full Size Image</span>
-        </a>
-        """, unsafe_allow_html=True)
-        
-        # Provide image dimensions info
-        image = Image.open(io.BytesIO(image_data))
-        st.caption(f"Full image dimensions: {image.width} x {image.height} px")
-    
-    # Export ad text
-    full_text = ad_text
-    if hashtags:
-        full_text += f"\n\n{hashtags}"
-    
-    st.download_button(
-        label="Download Ad Text",
-        data=full_text,
-        file_name="ad_text.txt",
-        mime="text/plain"
-    )
-
 # Generate button
 if st.button("Generate Ad", type="primary", use_container_width=True):
     if not part_type:
@@ -671,9 +505,8 @@ if st.button("Generate Ad", type="primary", use_container_width=True):
     elif not api_key:
         st.warning("Please provide an OpenAI API key to generate the ad.")
     else:
-        # Store temperature and image quality in session state
+        # Store temperature in session state
         st.session_state.temperature = st.session_state.get('temperature', 0.7)
-        st.session_state.image_quality = st.session_state.get('image_quality', 'standard')
         
         with st.spinner("Generating ad content..."):
             ad_text, hashtags = generate_ad_text(part_type, brand, ad_style, platform, target_audience, max_length)
@@ -681,71 +514,49 @@ if st.button("Generate Ad", type="primary", use_container_width=True):
             if ad_text:
                 st.success("Ad text generated!")
                 
-                # Generate image based on ad text and platform
-                with st.spinner("Creating matching image..."):
-                    image_data = generate_image(ad_text, part_type, platform)
+                # Store important data in session state for potential reuse
+                st.session_state.last_ad_text = ad_text
+                st.session_state.last_hashtags = hashtags
                 
-                if image_data:
-                    # Store important data in session state for potential reuse
-                    st.session_state.last_ad_text = ad_text
-                    st.session_state.last_hashtags = hashtags
-                    st.session_state.last_image_data = image_data
+                # Display the ad preview
+                st.header("Ad Preview")
+                
+                preview_col1, preview_col2 = st.columns([3, 2])
+                
+                with preview_col1:
+                    # Render platform-specific post UI
+                    render_platform_post(platform, brand, ad_text, hashtags)
+                
+                with preview_col2:
+                    st.subheader("Ad Details")
+                    st.write(f"**Part Type:** {part_type}")
+                    if brand:
+                        st.write(f"**Brand:** {brand}")
+                    st.write(f"**Style:** {ad_style}")
+                    st.write(f"**Platform:** {platform}")
+                    st.write(f"**Target Audience:** {target_audience}")
                     
-                    # Display the ad preview
-                    st.header("Ad Preview")
+                    # Export ad text
+                    full_text = ad_text
+                    if hashtags:
+                        full_text += f"\n\n{hashtags}"
                     
-                    preview_col1, preview_col2 = st.columns([3, 2])
-                    
-                    with preview_col1:
-                        # Render platform-specific post UI
-                        render_platform_post(platform, brand, ad_text, hashtags, image_data)
-                    
-                    with preview_col2:
-                        st.subheader("Ad Details")
-                        st.write(f"**Part Type:** {part_type}")
-                        if brand:
-                            st.write(f"**Brand:** {brand}")
-                        st.write(f"**Style:** {ad_style}")
-                        st.write(f"**Platform:** {platform}")
-                        st.write(f"**Target Audience:** {target_audience}")
-                        
-                        # Display enhanced download options
-                        display_download_options(image_data, ad_text, hashtags)
-                    
-                    # Collapsible sections for prompts and responses
-                    st.subheader("Generation Details")
-                    
-                    with st.expander("Text Generation Prompt & Response"):
-                        st.markdown("### Text Generation Prompt")
-                        st.code(f"System: {st.session_state.text_system_prompt_template}\n\nUser: {st.session_state.text_user_prompt_template}", language="markdown")
-                        
-                        st.markdown("### Text Generation Response")
-                        st.code(f"Ad Text: {ad_text}\n\nHashtags: {hashtags}", language="markdown")
-                    
-                    # Store the complete image prompt
-                    platform_style = ""
-                    if platform == "Instagram":
-                        platform_style = "styled for Instagram with clean, bright aesthetics"
-                    elif platform == "Facebook":
-                        platform_style = "styled for Facebook with engaging, shareable visuals"
-                    elif platform == "Twitter/X":
-                        platform_style = "styled for Twitter with clear, attention-grabbing imagery"
-                    elif platform == "LinkedIn":
-                        platform_style = "styled for LinkedIn with professional, business-appropriate imagery"
-                    elif platform == "TikTok":
-                        platform_style = "styled for TikTok with vibrant, trendy visuals that appeal to younger audiences"
-                    
-                    image_prompt = st.session_state.image_prompt_template.format(
-                        part_type=part_type,
-                        platform_style=platform_style,
-                        ad_text=ad_text
+                    st.download_button(
+                        label="Download Ad Text",
+                        data=full_text,
+                        file_name="ad_text.txt",
+                        mime="text/plain"
                     )
+                
+                # Collapsible sections for prompts and responses
+                st.subheader("Generation Details")
+                
+                with st.expander("Text Generation Prompt & Response"):
+                    st.markdown("### Text Generation Prompt")
+                    st.code(f"System: {st.session_state.text_system_prompt_template}\n\nUser: {st.session_state.text_user_prompt_template}", language="markdown")
                     
-                    with st.expander("Image Generation Prompt"):
-                        st.markdown("### Image Generation Prompt")
-                        st.code(image_prompt, language="markdown")
-                else:
-                    st.error("Failed to generate image. Please try again.")
+                    st.markdown("### Text Generation Response")
+                    st.code(f"Ad Text: {ad_text}\n\nHashtags: {hashtags}", language="markdown")
             else:
                 st.error("Failed to generate ad text. Please try again.")
 
