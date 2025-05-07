@@ -1,5 +1,3 @@
-# Automotive Parts Intelligence Tools
-
 ## Presented at ACPN 2025 - Autocare
 
 This repository contains Streamlit applications designed to demonstrate how artificial intelligence can be leveraged to improve automotive parts search and fitment analysis in the aftermarket industry.
