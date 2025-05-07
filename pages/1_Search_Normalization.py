@@ -1,20 +1,44 @@
 import streamlit as st
 import json
 import requests
-import time
 import os
 
 # Configure page settings
-st.set_page_config(page_title="Search", layout="wide",page_icon="🔍")
+st.set_page_config(page_title="Search Normalization", layout="wide",page_icon="🔍")
 
-st.info("🤖💬 Normalize slang and common terms for cars and parts, help funnel the customer to the right part!")
+st.subheader("🔍 Search Normalization")
+with st.expander("Description of Search Normalization", expanded=False):
+    st.markdown("""
+        This tool helps you convert customer search queries into standardized automotive terminology. You can:
 
-# Get API key from user input
+        - Transform casual or slang terms into proper automotive part names
+        - Convert vehicle descriptions into structured data (year, make, model)
+        - Identify parts based on symptoms or vague descriptions
+        - Standardize search terms for better results in parts catalogs
+        - Improve search accuracy by normalizing common variations
+
+        Whether customers search using technical terms, common names, or symptoms, this tool helps ensure they find the exact parts they need.
+    """)
+
+# Get API key from environment variable or ask user to enter it
 secret_value = os.getenv("OwadmasdujU")
+model_name = "gpt-4.1-nano"
+
 if not secret_value:
-    api_key = st.text_input("Enter your API key:", type="password")
+    with st.container(border=True):
+        st.subheader("OpenAI API Key")
+        st.warning("API key is not set. Please enter your API key below to continue to use the tool.")
+        api_key = st.text_input("Enter your API key:", type="password")
+        model_name = st.selectbox(
+            "Select OpenAI Model:", 
+            ["gpt-4.1-nano", "gpt-4o-mini"],
+            index=0
+        )
 else:
+    st.success("OpenAI API key has been provided for the demo. You can freely use the tool until the API key expires (estimated 2025-05-14 @ 12:00 MST).")
     api_key = secret_value
+
+st.divider()
 
 # Function to call OpenAI API with GPT-4.1 Nano
 def query_openai(prompt: str, api_key: str):
@@ -91,6 +115,7 @@ examples = [
     "2005 BMW 5 idle rough and stalling"
 ]
 
+st.write("Example Queries:")
 # Create horizontal layout for example buttons
 cols = st.columns(len(examples))
 for i, col in enumerate(cols):
