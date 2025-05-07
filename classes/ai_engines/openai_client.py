@@ -6,7 +6,7 @@ class OpenAI_Client:
         self.api_key = os.getenv("OwadmasdujU")
         self.DEFAULT_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-nano")
 
-    def generate_with_openai(self, prompt, model=None):
+    def generate_with_openai(self, prompt, model=None, language_code=None):
         """
         Generate text using OpenAI API
         
