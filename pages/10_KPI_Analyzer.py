@@ -397,7 +397,7 @@ if 'file_loaded' in st.session_state and st.session_state['file_loaded']:
                     st.subheader("Sample Visualization")
                     if charts:
                         charts[0].seek(0)
-                        st.image(charts[0], use_column_width=True)
+                        st.image(charts[0], use_container_width=True)
                     
                     # Download PowerPoint
                     st.header("6. Download Presentation")
