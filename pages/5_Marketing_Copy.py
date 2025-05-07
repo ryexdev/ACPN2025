@@ -20,14 +20,31 @@ This tool transforms raw supplier descriptions of auto parts into clear, custome
 
 Paste in a supplier-provided description and click **Rewrite Description** to instantly produce professional content ready for eCommerce.
 """)
+#API Key Control
+if 'openai_api_key' not in st.session_state:
+    st.session_state['openai_api_key'] = None
 secret_value = os.getenv("OwadmasdujU")
-if not secret_value:
-    with st.container(border=True):
-        st.warning("Please enter your [OpenAI API key](https://openai.com/api/).")
-        api_key = st.text_input("Enter your API key:", type="password")
-else:
+if secret_value:
     st.success("OpenAI API key has been provided until EOD 5/14/2025")
     api_key = secret_value
+    st.session_state['openai_api_key'] = secret_value
+elif st.session_state['openai_api_key']:
+    col1, col2 = st.columns([5, 1])
+    with col1:
+        st.success("Using user-provided OpenAI API key")
+    with col2:
+        if st.button("Clear Key", type="secondary", use_container_width=True):
+            st.session_state['openai_api_key'] = None
+            st.rerun()
+    api_key = st.session_state['openai_api_key']
+else:
+    with st.container(border=True):
+        st.warning("Please enter your [OpenAI API key](https://openai.com/api/).")
+        api_key_input = st.text_input("Enter your API key:", type="password")
+        if api_key_input:
+            st.session_state['openai_api_key'] = api_key_input
+        api_key = st.session_state['openai_api_key']
+        
 st.divider()
 #-----------------------------------------------------------
 
