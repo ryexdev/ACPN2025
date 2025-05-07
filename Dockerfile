@@ -8,7 +8,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Create a volume for the database
-VOLUME /app/classes/db
+VOLUME /classes/db
 
 # Expose the port that Streamlit uses
 EXPOSE 8501
@@ -18,7 +18,8 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     STREAMLIT_SERVER_PORT=8501 \
     STREAMLIT_SERVER_HEADLESS=true \
-    STREAMLIT_SERVER_ENABLE_CORS=false
+    STREAMLIT_SERVER_ENABLE_CORS=false \
+    STREAMLIT_SERVER_FILE_WATCHER_TYPE=none
 
 # Command to run the application
 CMD ["streamlit", "run", "Home.py", "--server.address=0.0.0.0"] 
