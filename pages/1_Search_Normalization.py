@@ -3,6 +3,7 @@ import json
 import requests
 import os
 
+#------------ Header with API control ------------
 # Configure page settings
 st.set_page_config(page_title="Search Normalization", layout="wide",page_icon="🔍")
 
@@ -20,24 +21,17 @@ with st.expander("Description of Search Normalization", expanded=False):
         Whether customers search using technical terms, common names, or symptoms, this tool helps ensure they find the exact parts they need.
     """)
 
-# Get API key from environment variable or ask user to enter it
 secret_value = os.getenv("OwadmasdujU")
 model_name = "gpt-4.1-nano"
 
 if not secret_value:
     with st.container(border=True):
         st.subheader("OpenAI API Key")
-        st.warning("API key is not set. Please enter your API key below to continue to use the tool.")
+        st.warning("Please enter your [OpenAI API key](https://openai.com/api/).")
         api_key = st.text_input("Enter your API key:", type="password")
-        model_name = st.selectbox(
-            "Select OpenAI Model:", 
-            ["gpt-4.1-nano", "gpt-4o-mini"],
-            index=0
-        )
 else:
-    st.success("OpenAI API key has been provided for the demo. You can freely use the tool until the API key expires (estimated 2025-05-14 @ 12:00 MST).")
+    st.success("OpenAI API key has been provided until EOD 5/14/2025")
     api_key = secret_value
-
 st.divider()
 
 # Function to call OpenAI API with GPT-4.1 Nano
