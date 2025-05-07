@@ -7,3 +7,4 @@ python-pptx
 matplotlib
 seaborn
 xlsxwriter
+python-dotenv
