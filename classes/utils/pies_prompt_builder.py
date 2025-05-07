@@ -7,10 +7,10 @@ class PIES_Prompt_Builder:
     def convert_language_code_to_name(self, language_code):
         """Convert language code to language name"""
         return {
-            "EN": "English",
-            "ES": "Spanish",
-            "FR": "French",
-            "DE": "German"
+            "ENGL": "English",
+            "SPAN": "Spanish",
+            "FREN": "French",
+            "GERM": "German"
         }.get(language_code, "English")
     
 
@@ -98,7 +98,7 @@ class PIES_Prompt_Builder:
                 - engine_application: Engine compatibility (optional)
                 - material: Material of the part (optional)
                 - fitment: Fitment information (optional)
-            description_type (str): PIES description code (DES, ABR, FAB, etc.)
+            description_type (str): PIES description code
         
         Returns:
             str: A formatted prompt for the AI

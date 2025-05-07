@@ -206,17 +206,17 @@ with colBody2:
         with st.expander("Advanced Options"):
             language_code = st.selectbox(
                 "Language Code", 
-                ["EN", "ES", "FR", "DE"],
+                ["ENGL", "SPAN", "FREN", "GERM"],
                 index=0
             )
             maintenance_type = st.selectbox(
                 "Maintenance Type", 
-                ["A", "D", "N"],
+                ["ADD", "DEL", "NOC"],
                 index=0,
                 format_func=lambda x: {
-                    "A": "A - Add or change",
-                    "D": "D - Delete",
-                    "N": "N - No change"
+                    "ADD": "A - Add or Update",
+                    "DEL": "D - Delete",
+                    "NOC": "N - No Change"
                 }.get(x, x)
             )
             sequence = st.number_input("Sequence", min_value=1, max_value=999, value=1)
