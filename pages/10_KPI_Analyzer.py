@@ -19,20 +19,55 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Get API key from environment variable or ask user
+secret_value = None
+# secret_value = os.getenv("OwadmasdujU")
+model_name = "gpt-4.1-nano"
+
 # Title and description
 st.title("📊 KPI Analyzer")
-st.markdown("""
-Transform your raw data into insightful KPI reports and presentations. 
-Upload your data files, let AI analyze the trends, and generate ready-to-present PowerPoint slides.
-""")
+with st.expander("Description of KPI Analyzer", expanded=True):
+    st.markdown("""
+    Transform your raw data into insightful KPI reports and presentations. This powerful tool helps you:
+
+    - Upload and analyze CSV, TSV, or Excel files containing your business metrics
+    - Generate automated insights and trend analysis using AI
+    - Create professional PowerPoint presentations with data visualizations
+    - Compare performance against targets and identify key trends
+    - Export ready-to-use reports for meetings and presentations
+    - Use sample datasets to explore the tool's capabilities
+
+    Whether you're analyzing sales performance, customer satisfaction, or inventory metrics, 
+    this tool helps you turn complex data into clear, actionable insights.
+    """)
+
+# Get API key from environment variable or ask user to enter it
+if not secret_value:
+    with st.container(border=True):
+        st.subheader("OpenAI API Key")
+        st.warning("API key is not set. Please enter your API key below to continue to use the tool.")
+        api_key = st.text_input("Enter your API key:", type="password")
+        model_name = st.selectbox(
+            "Select OpenAI Model:", 
+            ["gpt-4.1-nano", "gpt-4o-mini"],
+            index=0
+        )
+else:
+    st.success("OpenAI API key has been provided for the demo. You can freely use the tool until the API key expires (estimated 2025-05-14 @ 12:00 MST).")
+    api_key = secret_value
+
+st.divider()
 
 # Check if required libraries are installed
 try:
     import python_pptx
 except ImportError:
-    st.warning("Installing required libraries...")
+    st.info("Installing required libraries...")
     os.system("pip install python-pptx matplotlib seaborn")
-    st.success("Libraries installed! Please refresh the page.")
+    st.success("Libraries installed!")
+except Exception as e:
+    st.error(f"Error installing libraries: {e}. Contact the developer for assistance.")
+    st.stop()
 
 # File upload section
 st.header("1. Upload Your Data")
@@ -162,31 +197,17 @@ if 'file_loaded' in st.session_state and st.session_state['file_loaded']:
     # OpenAI API settings
     st.header("4. AI Analysis Settings")
     
-    with st.expander("OpenAI API Settings", expanded=True):
-        # Get API key from environment variable or ask user
-        secret_value = os.getenv("OwadmasdujU")
-        if not secret_value:
-            api_key = st.text_input("Enter your OpenAI API key:", type="password")
-        else:
-            api_key = secret_value
         
-        # Model selection
-        model_name = st.selectbox(
-            "Select OpenAI Model:", 
-            ["gpt-4.1-nano", "gpt-4o-mini", "gpt-4o"],
-            index=0
-        )
-        
-        # Analysis focus
-        analysis_focus = st.selectbox(
-            "Analysis Focus:",
-            ["General Performance Overview", 
-             "Trend Analysis and Forecasting", 
-             "Key Improvement Areas", 
-             "Comparative Analysis", 
-             "Executive Summary"],
-            index=0
-        )
+    # Analysis focus
+    analysis_focus = st.selectbox(
+        "Analysis Focus:",
+        ["General Performance Overview", 
+            "Trend Analysis and Forecasting", 
+            "Key Improvement Areas", 
+            "Comparative Analysis", 
+            "Executive Summary"],
+        index=0
+    )
     
     # Create the analysis and presentation
     if st.button("Generate KPI Analysis & Presentation", type="primary"):
