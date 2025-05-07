@@ -5,9 +5,10 @@ import os
 
 #---------------- Header with API control --------------
 pagename = "Returns Review"
-st.set_page_config(page_title=pagename, layout="wide",page_icon="🧑‍🔧")
-st.subheader(f"📃 {pagename}")
-with st.expander("Description of Review Fitment Analyzer", expanded=False):
+pageicon = "🛠"
+st.set_page_config(page_title=pagename, layout="wide",page_icon=pageicon)
+st.subheader(f"{pageicon} {pagename}")
+with st.expander(f"Description of {pagename}", expanded=False):
     st.markdown("""
 This tool helps identify potential **fitment or compatibility issues** in customer product reviews for automotive parts. It leverages AI to extract and summarize recurring problems related to part compatibility by analyzing unstructured review text. You can:
 

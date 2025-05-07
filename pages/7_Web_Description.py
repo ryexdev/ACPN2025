@@ -2,13 +2,13 @@ import streamlit as st
 import json
 import requests
 import os
-import time
 
 #---------------- Header with API control --------------
-pagename = "Parts Description Enhancer"
-st.set_page_config(page_title=pagename, layout="wide", page_icon="🔍")
-st.subheader(f"🔄 {pagename}")
-with st.expander("Description of Parts Description Enhancer", expanded=False):
+pagename = "Web Description"
+pageicon = "🌐"
+st.set_page_config(page_title=pagename, layout="wide",page_icon=pageicon)
+st.subheader(f"{pageicon} {pagename}")
+with st.expander(f"Description of {pagename}", expanded=False):
     st.markdown("""
 This tool demonstrates how AI can be used in multiple successive steps to transform basic part information into comprehensive, customer-ready content. The tool follows these steps:
 

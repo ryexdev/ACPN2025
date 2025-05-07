@@ -5,9 +5,10 @@ import os
 
 #---------------- Header with API control --------------
 pagename = "Marketing Copy"
-st.set_page_config(page_title=pagename, layout="wide",page_icon="💹")
-st.subheader(f"📃 {pagename}")
-with st.expander("Description of Marketing Copy Generator", expanded=False):
+pageicon = "📑"
+st.set_page_config(page_title=pagename, layout="wide",page_icon=pageicon)
+st.subheader(f"{pageicon} {pagename}")
+with st.expander(f"Description of {pagename}", expanded=False):
     st.markdown("""
 This tool transforms raw supplier descriptions of auto parts into clear, customer-friendly **marketing copy**. It uses AI to convert technical or unstructured product data into standardized, engaging content that improves online catalog quality. You can:
 

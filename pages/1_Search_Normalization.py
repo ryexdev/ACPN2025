@@ -5,9 +5,10 @@ import os
 
 #---------------- Header with API control --------------
 pagename = "Search Normalization"
-st.set_page_config(page_title=pagename, layout="wide",page_icon="🧑‍🔧")
-st.subheader(f"📃 {pagename}")
-with st.expander("Description of Search Normalization", expanded=False):
+pageicon = "🔍"
+st.set_page_config(page_title=pagename, layout="wide",page_icon=pageicon)
+st.subheader(f"{pageicon} {pagename}")
+with st.expander(f"Description of {pagename}", expanded=False):
     st.markdown("""
 This tool helps you convert customer search queries into standardized automotive terminology. You can:
 
