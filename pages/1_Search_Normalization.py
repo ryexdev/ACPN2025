@@ -20,7 +20,6 @@ This tool helps you convert customer search queries into standardized automotive
 Whether customers search using technical terms, common names, or symptoms, this tool helps ensure they find the exact parts they need.
 """)
 secret_value = os.getenv("OwadmasdujU")
-model_name = "gpt-4.1-nano"
 if not secret_value:
     with st.container(border=True):
         st.warning("Please enter your [OpenAI API key](https://openai.com/api/).")

@@ -20,7 +20,6 @@ This tool helps identify potential **fitment or compatibility issues** in custom
 Just paste or edit a set of customer reviews, and click **Analyze Reviews** to generate an AI-powered summary of key issues and affected vehicles.
 """)
 secret_value = os.getenv("OwadmasdujU")
-model_name = "gpt-4.1-nano"
 if not secret_value:
     with st.container(border=True):
         st.warning("Please enter your [OpenAI API key](https://openai.com/api/).")

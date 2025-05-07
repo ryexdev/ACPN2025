@@ -20,7 +20,6 @@ This tool transforms raw supplier descriptions of auto parts into clear, custome
 Paste in a supplier-provided description and click **Rewrite Description** to instantly produce professional content ready for eCommerce.
 """)
 secret_value = os.getenv("OwadmasdujU")
-model_name = "gpt-4.1-nano"
 if not secret_value:
     with st.container(border=True):
         st.warning("Please enter your [OpenAI API key](https://openai.com/api/).")
