@@ -10,6 +10,11 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Get API key from environment variable
+# secret_value = None
+secret_value = os.getenv("OwadmasdujU")
+model_name = "gpt-4.1-nano"
+
 # Sample data
 SAMPLE_QUESTIONS_AND_EMAILS = {
     "How to make this marketing email more engaging?": 
@@ -43,28 +48,40 @@ def improve_email(email_text, model_name, api_key):
 
 # Main application
 st.title("✉️ Professional Email Improver")
-st.markdown("Transform your basic emails into professional, warm, and personalized communications")
+with st.expander("Description of Professional Email Improver", expanded=True):
+    st.markdown("""
+        Transform your basic emails into professional, warm, and personalized communications. This tool helps you:
 
-# Sidebar for OpenAI API settings
-st.sidebar.title("OpenAI API Settings")
+    - Enhance your email tone and professionalism while maintaining warmth
+    - Improve clarity and structure of your messages
+    - Add personalized touches to make your emails more engaging
+    - Get suggestions for better word choices and phrasing
+    - Create more effective business communications
+
+    Choose from sample scenarios or input your own email to get AI-powered improvements tailored to your needs.
+    """)
 
 # Get API key from environment variable or ask user
-secret_value = os.getenv("OwadmasdujU")
 if not secret_value:
-    api_key = st.text_input("Enter your API key:", type="password")
+    with st.container(border=True):
+        st.subheader("OpenAI API Key")
+        st.warning("API key is not set. Please enter your API key below to continue to use the tool.")
+        secret_value = st.text_input("Enter your OpenAI API key", type="password")
+        # Model selection
+        model_name = st.selectbox(
+            "Select OpenAI Model (selected model required for the tool to work):", 
+            ["gpt-4o"],
+            index=0,
+            disabled=True
+        )
 else:
+    st.success("OpenAI API key has been provided for the demo. You can freely use the tool until the API key expires (estimated 2025-05-14 @ 12:00 MST).")
     api_key = secret_value
 
-# Model selection
-model_name = st.sidebar.selectbox(
-    "Select OpenAI Model:", 
-    ["gpt-4.1-nano", "gpt-4o-mini"],
-    index=0
-)
+st.divider()
 
 # Main content
 st.header("Email Selection")
-
 # Selection options: either pick a sample or write custom
 input_option = st.radio(
     "Select an option:",
@@ -83,12 +100,13 @@ if input_option == "Choose from sample emails":
     email_text = SAMPLE_QUESTIONS_AND_EMAILS[selected_question]
     
     # Display the selected email
-    st.subheader("Original Email")
-    st.text_area("Original content:", email_text, height=150, key="original_sample", disabled=True)
+    # st.subheader("Original Email")
+    st.text_area(f"Original content (auto filled for selected scenario: `{selected_question}`):", email_text, height=150, key="original_sample", disabled=True)
     
 else:
     # Custom email input
     st.subheader("Your Email")
+    st.markdown("<i>Enter your email text that you want to improve in the text area below.</i>", unsafe_allow_html=True)
     email_text = st.text_area(
         "Enter your email text:",
         "",
@@ -159,4 +177,4 @@ with st.expander("Tips for Professional Emails"):
 
 # Footer
 st.markdown("---")
-st.markdown("✨ *Powered by OpenAI and the Executive Editor prompt* ✨") 
+st.markdown(f"✨ *Powered by OpenAI and the [Executive Editor GPT](https://www.gpt-editor.com/prompt/gpt-executive-editor) prompt* ✨") 
