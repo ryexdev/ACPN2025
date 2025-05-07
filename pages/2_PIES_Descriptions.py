@@ -10,6 +10,17 @@ from classes.ai_engines.openai_client import openai_client
 from classes.ai_engines.ollama_client import ollama_client
 from classes.db import db
 
+# Ollama API key (Check README.md for more information)
+# secret_value = None
+secret_value = os.getenv("OwadmasdujU")
+model_source = "OpenAI"
+model_name = "gpt-4.1-nano"
+
+# Disable Ollama option for the demo
+# Look at the README.md file for more information
+ollama_inactive = True
+
+
 # Page configuration
 st.set_page_config(
     page_title="PIES Description Builder",
@@ -17,53 +28,6 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
-
-# Database connection function
-def get_db_connection():
-    """Create a connection to the MySQL database with multiple fallbacks using PyMySQL"""
-    st.sidebar.markdown("### Database Connection")
-    
-    # Check if we're running inside Docker
-    in_docker = os.path.exists('/.dockerenv')
-    
-    # Configure based on environment
-    if in_docker:
-        st.sidebar.text("Running inside Docker container")
-        # In Docker, use the Docker service name
-        configs = [
-            {"host": "db", "port": 3306},
-            {"host": "pies-desc-genie-db-1", "port": 3306},
-        ]
-    else:
-        st.sidebar.text("Running on host machine")
-        # On host machine, connect to the exposed port
-        configs = [
-            {"host": "localhost", "port": 3307},
-            {"host": "127.0.0.1", "port": 3307}
-        ]
-    
-    
-    # Check if the database connection is successful
-    if not db.connection_status():
-        st.sidebar.error("❌ Failed to connect to database")
-        return None
-    else:
-        st.sidebar.success("✅ Connected to database")
-    
-    return db.get_connection()
-
-# Function to fetch available Ollama models
-def get_ollama_models(ollama_url):
-    """Fetch available models from Ollama server"""
-    try:
-        response = requests.get(f"{ollama_url}/api/tags")
-        if response.status_code == 200:
-            models = response.json().get("models", [])
-            return [model["name"] for model in models]
-        return ["llama2"]  # Default fallback
-    except Exception as e:
-        st.warning(f"Could not fetch Ollama models: {e}")
-        return ["llama2"]  # Default fallback
 
 # Function to generate PIES description
 def generate_description(prompt, model_source, model_name, api_key=None, ollama_url=None):
@@ -80,159 +44,196 @@ def generate_description(prompt, model_source, model_name, api_key=None, ollama_
         st.error(f"Error generating description: {e}")
         return None
 
-# Sidebar for model selection
-st.sidebar.title("AI Model Selection")
-
-model_source = st.sidebar.radio("Choose Model Source:", ["OpenAI", "Ollama"])
-
-if model_source == "OpenAI":
-    model_name = st.sidebar.selectbox("Select OpenAI Model:", ["gpt-4o-mini", "gpt-4o", "gpt-3.5-turbo","gpt-4.1-nano"])
-    
-    # Get API key from environment variable or ask user
-    secret_value = os.getenv("OwadmasdujU")
-    if not secret_value:
-        api_key = st.text_input("Enter your API key:", type="password")
-    else:
-        api_key = secret_value
-    
-else:
-    ollama_url = st.sidebar.text_input("Ollama Server URL", value=os.getenv("OLLAMA_URL", "http://localhost:11434"))
-    
-    # Fetch Ollama models button
-    if st.sidebar.button("Fetch Ollama Models"):
-        ollama_models = get_ollama_models(ollama_url)
-        st.session_state["ollama_models"] = ollama_models
-    
-    # Use cached models or defaults
-    ollama_models = st.session_state.get("ollama_models", ["llama2", "mistral", "phi3"])
-    model_name = st.sidebar.selectbox("Select Ollama Model:", ollama_models)
 
 # Main application
 st.title("PIES Description Builder")
-st.markdown("Generate Auto Care PIES-compliant product descriptions using AI")
+with st.expander("Description of PIES Description Builder"):
+    st.markdown(f"""
+    This tool helps you generate professional product descriptions that comply with Auto Care PIES (Product Information Exchange Standard) requirements using AI technology.
 
-# Part Selection Section
-st.header("Part Information")
+    You can:
+    - Connect to either OpenAI or Ollama language models { "<i>(Ollama deactivated for demo)</i>" if ollama_inactive else "OpenAI" }
+    - Select parts from an existing database or enter new part details manually  
+    - Generate accurate, standardized descriptions for automotive parts and components
+    - Save generated descriptions for future reference
 
-# Option to select from database or enter manually
-input_mode = st.radio("Select input mode:", ["Select from Database", "Enter Manually"])
+    The AI models are specifically tuned to create consistent, detailed product descriptions following PIES formatting guidelines and automotive industry best practices.
+    """, unsafe_allow_html=True)
 
-product_info = {}
+if not secret_value:
+    with st.container(border=True):
+        st.subheader("OpenAI API Key")
+        st.warning("API key is not set. Please enter your API key below to continue to use the tool.")
+        api_key = st.text_input("Enter your API key:", type="password")
+else:
+    st.success("OpenAI API key has been provided for the demo. You can freely use the tool until the API key expires (estimated 2025-05-14 @ 12:00 MST).")
+    api_key = secret_value
 
-if input_mode == "Select from Database":
-    # Connect to database and fetch part numbers
-    conn = get_db_connection()
-    if conn:
-        cursor = conn.cursor()
-        cursor.execute("SELECT part_number, product_category, brand FROM parts LIMIT 100")
-        parts = cursor.fetchall()
+if not ollama_inactive:
+    with st.expander("LLM Connection Configuration"):
+        st.write("This section allows you to configure the connection to the LLM (Large Language Model). You can choose between OpenAI and Ollama as your LLM provider. If you choose OpenAI, you need to provide your API key. If you choose Ollama, you need to provide the URL of the Ollama server.")
         
-        if parts:
-            # Create a selection dataframe
-            parts_df = pd.DataFrame(parts)
-            selected_part = st.selectbox(
-                "Select Part Number:", 
-                parts_df["part_number"].tolist(),
-                format_func=lambda x: f"{x} - {parts_df[parts_df['part_number']==x]['product_category'].iloc[0]}"
-            )
+        model_source = st.radio("Choose Model Source:", ["OpenAI", "Ollama"])
+
+        if model_source == "OpenAI":
+            model_name = st.selectbox("Select OpenAI Model:", ["gpt-4.1-nano", "gpt-4o-mini"])
             
-            # Fetch detailed part information
-            cursor.execute(
-                "SELECT * FROM parts WHERE part_number = ?", 
-                (selected_part,)
-            )
-            part_details = cursor.fetchone()
-            
-            if part_details:
-                product_info = part_details
-                
-                # Display part details
-                st.subheader("Part Details")
-                col1, col2 = st.columns(2)
-                with col1:
-                    st.write(f"**Part Number:** {part_details['part_number']}")
-                    st.write(f"**Product Category:** {part_details['product_category']}")
-                with col2:
-                    st.write(f"**Brand:** {part_details['brand']}")
-                    st.write(f"**Part Type:** {part_details.get('part_type', 'N/A')}")
         else:
-            st.warning("No parts found in database. Please enter part information manually.")
-            input_mode = "Enter Manually"
-        
-        cursor.close()
-        conn.close()
-    else:
-        st.warning("Could not connect to database. Please enter part information manually.")
-        input_mode = "Enter Manually"
+            st.warning("Ollama integration is currently not configured for this demo. Please use OpenAI.")
+            ollama_url = st.text_input("Ollama Server URL", value=os.getenv("OLLAMA_URL", "http://localhost:11434"), disabled=ollama_inactive)
+            
+            # Fetch Ollama models button
+            if st.button("Fetch Ollama Models", disabled=ollama_inactive):
+                ollama_models = ollama_client.get_ollama_models(ollama_url)
+                st.session_state["ollama_models"] = ollama_models
+            
+            # Use cached models or defaults
+            ollama_models = st.session_state.get("ollama_models", ["llama2", "mistral", "phi3"])
+            model_name = st.selectbox("Select Ollama Model:", ollama_models, disabled=ollama_inactive)
 
-if input_mode == "Enter Manually":
-    col1, col2 = st.columns(2)
-    with col1:
-        part_number = st.text_input("Part Number")
-        product_category = st.text_input("Product Category (e.g., Ignition Coil, Oxygen Sensor)")
-    with col2:
-        brand = st.text_input("Brand")
-        part_type = st.text_input("Part Type")
+colBody1, colBody2 = st.columns([1,3])
+with colBody1:
+    # Part Selection Section
+    st.header("Part Information")
+    st.write("Please select the part information from the database or enter the information manually.")
+    with st.container(border=True):
+
+        # Option to select from database or enter manually
+        input_mode = st.radio("Select input mode:", ["Select from Database", "Enter Manually"])
+
+        product_info = {}
+
+        if input_mode == "Select from Database":
+            # Connect to database and fetch part numbers
+            conn = db.get_connection()
+            if conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT part_number, product_category, brand FROM parts LIMIT 100")
+                parts = cursor.fetchall()
+                
+                if parts:
+                    # Create a selection dataframe
+                    parts_df = pd.DataFrame(parts)
+                    selected_part = st.selectbox(
+                        "Select Part Number:", 
+                        parts_df["part_number"].tolist(),
+                        format_func=lambda x: f"{x} - {parts_df[parts_df['part_number']==x]['product_category'].iloc[0]}"
+                    )
+                    
+                    # Fetch detailed part information
+                    cursor.execute(
+                        "SELECT * FROM parts WHERE part_number = ?", 
+                        (selected_part,)
+                    )
+                    part_details = cursor.fetchone()
+                    
+                    if part_details:
+                        product_info = part_details
+                        
+                        # Display part details
+                        st.subheader("Part Details")
+                        
+                        # Create data for table
+                        data = {
+                            "Field": ["Part Number", "Product Category", "Brand", "Part Type"],
+                            "Value": [
+                                part_details['part_number'],
+                                part_details['product_category'], 
+                                part_details['brand'],
+                                part_details.get('part_type', 'N/A')
+                            ]
+                        }
+                        
+                        # Convert to DataFrame and display as table
+                        df = pd.DataFrame(data)
+                        # Create a more key-value style table by not transposing
+                        st.table(df.set_index('Field').style.set_properties(**{'width': '75%'}))
+                else:
+                    st.warning("No parts found in database. Please enter part information manually.")
+                    input_mode = "Enter Manually"
+                
+                cursor.close()
+                conn.close()
+            else:
+                st.warning("Could not connect to database. Please enter part information manually.")
+                input_mode = "Enter Manually"
+
+        if input_mode == "Enter Manually":
+            col1, col2 = st.columns(2)
+            with col1:
+                part_number = st.text_input("Part Number")
+                product_category = st.text_input("Category (e.g. Oxygen Sensor)")
+            with col2:
+                brand = st.text_input("Brand")
+                part_type = st.text_input("Part Type")
+            
+            # Additional attributes
+            st.subheader("Additional Attributes (Optional)")
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                engine_application = st.text_input("Engine Application")
+            with col2:
+                material = st.text_input("Material")
+            with col3:
+                fitment = st.text_input("Fitment")
+            
+            # Store manually entered info
+            product_info = {
+                "part_number": part_number,
+                "product_category": product_category,
+                "brand": brand,
+                "part_type": part_type,
+                "engine_application": engine_application,
+                "material": material,
+                "fitment": fitment
+            }
+
+
+with colBody2:
+    # Description Configuration
+    st.header("Description Configuration")
+    st.write("""Please select the description type and advanced options below.The description type determines the format and purpose of the generated content. Advanced options allow you to customize the language code, maintenance type, and sequence.""")
     
-    # Additional attributes
-    st.subheader("Additional Attributes (Optional)")
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        engine_application = st.text_input("Engine Application")
-    with col2:
-        material = st.text_input("Material")
-    with col3:
-        fitment = st.text_input("Fitment")
-    
-    # Store manually entered info
-    product_info = {
-        "part_number": part_number,
-        "product_category": product_category,
-        "brand": brand,
-        "part_type": part_type,
-        "engine_application": engine_application,
-        "material": material,
-        "fitment": fitment
-    }
+    with st.container(border=True):
+        # Description type selection
+        desc_codes = pies_prompt_builder.get_pies_description_codes()
+        description_type = st.selectbox(
+            "Select Description Type", 
+            list(desc_codes.keys()),
+            format_func=lambda x: f"{x} - {desc_codes[x]}"
+        )
 
-# Description Configuration
-st.header("Description Configuration")
+        # Advanced options (collapsible)
+        with st.expander("Advanced Options"):
+            language_code = st.selectbox(
+                "Language Code", 
+                ["EN", "ES", "FR", "DE"],
+                index=0
+            )
+            maintenance_type = st.selectbox(
+                "Maintenance Type", 
+                ["A", "D", "N"],
+                index=0,
+                format_func=lambda x: {
+                    "A": "A - Add or change",
+                    "D": "D - Delete",
+                    "N": "N - No change"
+                }.get(x, x)
+            )
+            sequence = st.number_input("Sequence", min_value=1, max_value=999, value=1)
 
-# Description type selection
-desc_codes = pies_prompt_builder.get_pies_description_codes()
-description_type = st.selectbox(
-    "Select Description Type", 
-    list(desc_codes.keys()),
-    format_func=lambda x: f"{x} - {desc_codes[x]}"
-)
 
-# Advanced options (collapsible)
-with st.expander("Advanced Options"):
-    language_code = st.selectbox(
-        "Language Code", 
-        ["EN", "ES", "FR", "DE"],
-        index=0
-    )
-    maintenance_type = st.selectbox(
-        "Maintenance Type", 
-        ["A", "D", "N"],
-        index=0,
-        format_func=lambda x: {
-            "A": "A - Add or change",
-            "D": "D - Delete",
-            "N": "N - No change"
-        }.get(x, x)
-    )
-    sequence = st.number_input("Sequence", min_value=1, max_value=999, value=1)
+st.divider()
 
 # Description generation and display
 st.header("Description Generation")
+st.write("""Please click the button below to generate the description. The description will be displayed in the text area below. You can edit the description if needed. Once you are happy with the description, you can click the button to save the description to the database.""")
 
 generate_button = st.button("Generate Description")
 
 if generate_button and product_info.get("product_category"):
     # Build prompt from product info
-    prompt = pies_prompt_builder.build_pies_prompt(product_info, description_type)
+    prompt = pies_prompt_builder.build_pies_prompt(product_info, description_type, language_code)
     
     # Show the prompt (collapsible)
     with st.expander("View Prompt"):
@@ -343,5 +344,6 @@ if "descriptions" in st.session_state and st.session_state.descriptions:
     
     # Clear button
     if st.button("Clear All Descriptions"):
-        st.session_state.descriptions = []
-        st.experimental_rerun() 
+        if "descriptions" in st.session_state:
+            del st.session_state.descriptions
+        st.rerun()
