@@ -1,6 +1,10 @@
 import streamlit as st
 import requests
 import classes.db.initalize_database as initialize_database
+from utils import load_environment
+
+# Load environment variables from .env file
+load_environment()
 
 # Initialize the database
 initialize_database.InitializeDatabase().create_database()
