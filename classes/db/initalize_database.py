@@ -7,9 +7,10 @@ class InitializeDatabase:
 
     def __init__(self):
         # Define the path to the database
-        self.DB_DIR = 'classes/db'
+        self.BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        self.DB_DIR = os.path.join(self.BASE_DIR, 'classes', 'db')
         self.DB_PATH = os.path.join(self.DB_DIR, 'pies.db')
-        self.SQL_FILE = 'classes/data/db_setup.sql'
+        self.SQL_FILE = os.path.join(self.BASE_DIR, 'classes', 'data', 'db_setup.sql')
 
     def create_database(self):
         """Create the SQLite database and necessary tables"""
@@ -19,6 +20,14 @@ class InitializeDatabase:
         # Check if database already exists
         if os.path.exists(self.DB_PATH):
             print(f"Database already exists at {self.DB_PATH}")
+            return
+        
+        # Check if SQL file exists
+        if not os.path.exists(self.SQL_FILE):
+            print(f"SQL file not found at {self.SQL_FILE}")
+            # Create an empty database if SQL file doesn't exist
+            conn = sqlite3.connect(self.DB_PATH)
+            conn.close()
             return
         
         # Connect to the database (this will create it if it doesn't exist)
