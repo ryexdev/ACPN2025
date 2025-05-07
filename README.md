@@ -82,13 +82,13 @@ export OwadmasdujU=your_openai_api_key
 
 ## About the Authors
 
-### Ryan Bachman
+### [Ryan Bachman](https://www.linkedin.com/in/bachmanryan/)
 **CIO & VP Product**
 **United Motor Products**
 
 Ryan leverages technology to enhance automotive aftermarket operations and improve customer experiences. With extensive experience in building technology solutions for the automotive industry, Ryan focuses on implementing AI-driven processes to streamline parts identification and inventory management.
 
-### [Ryan Henderson]https://www.linkedin.com/in/ryan-andrew-henderson/
+### [Ryan Henderson](https://www.linkedin.com/in/ryan-andrew-henderson/)
 **Head of Data and Catalog**
 **CarParts.com**
 
