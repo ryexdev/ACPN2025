@@ -62,7 +62,7 @@ Key benefits of this architecture:
 
 3. Run the Streamlit application:
    ```
-   streamlit run app.py
+   streamlit run Home.py
    ```
 
 ### Usage
