@@ -1,24 +1,51 @@
 import streamlit as st
 from openai import OpenAI
 import os
-import json
+
+# Get API key from environment variable
+# secret_value = None
+secret_value = os.getenv("OwadmasdujU")
+model_name = "gpt-4o"
 
 # Set up the page configuration
-st.set_page_config(page_title="Auto Parts Price Scraper", page_icon="🔍")
+st.set_page_config(
+    page_title="AI Price Collection", 
+    page_icon="💵",
+    layout="wide"
+)
 
 # Title and description
-st.title("AI Price Collection")
-st.markdown("Collect prices for auto parts across multiple retailers using AI")
+st.title("💵 AI Price Collection")
+with st.expander("Description of AI Price Collection", expanded=True):
+    st.markdown("""
+    This tool helps you collect and compare prices for automotive parts across multiple online retailers using AI technology. You can:
+
+    - Search for specific part numbers across major auto parts retailers
+    - Get real-time price comparisons from different websites
+    - View detailed product information including availability and shipping options
+    - Track price history and identify the best deals
+    - Export price data for analysis and reporting
+
+    The AI-powered search ensures accurate price matching and helps you find the best deals for your automotive parts needs.
+    """)
 
 # Get API key from environment variable or ask user
-open_ai_api_key = os.getenv("OwadmasdujU")
+if not secret_value:
+    with st.container(border=True):
+        st.subheader("OpenAI API Key")
+        st.warning("API key is not set. Please enter your API key below to continue to use the tool.")
+        secret_value = st.text_input("Enter your OpenAI API key", type="password")
+        # Model selection
+        model_name = st.selectbox(
+            "Select OpenAI Model (selected model required for the tool to work):", 
+            ["gpt-4o"],
+            index=0,
+            disabled=True
+        )
+else:
+    st.success("OpenAI API key has been provided for the demo. You can freely use the tool until the API key expires (estimated 2025-05-14 @ 12:00 MST).")
+    open_ai_api_key = secret_value
 
-# Model selection
-model_name = st.sidebar.selectbox(
-    "Select OpenAI Model:", 
-    ["gpt-4o"],
-    index=0
-)
 
 def search_openai_for_price(part_number, retailer_site, part_type):
     # Create a container for logs
@@ -27,7 +54,7 @@ def search_openai_for_price(part_number, retailer_site, part_type):
     # Log the steps and parameters
     with log_container:
         st.write("### Step 1: Setting up parameters")
-        st.write(f"Part Number: {part_number}")
+        st.write(f"Part Number: `{part_number}`")
         st.write(f"Retailer Site: {retailer_site}")
         
         # Create a search query specifically formatted for part price search
@@ -154,9 +181,8 @@ if 'selected_store' not in st.session_state:
     st.session_state.selected_store = None
 if 'reset_values' not in st.session_state:
     st.session_state.reset_values = False
-
-# Get unique part numbers to avoid duplicates in the dropdown
-unique_part_numbers = list(set(option["part_number"] for option in product_options))
+if 'input_mode' not in st.session_state:
+    st.session_state.input_mode = 'demo'
 
 # Callback for part number change
 def on_part_number_change():
@@ -178,66 +204,123 @@ def on_part_type_change():
     st.session_state.part_type = selected_part_type
     st.session_state.selected_store = None
 
-# Outside the form, select part number
-part_number = st.selectbox(
-    "Select Part Number", 
-    options=unique_part_numbers, 
-    key="part_number_select",
-    on_change=on_part_number_change
-)
+# Callback for input mode change
+def on_input_mode_change():
+    # Reset values when switching between demo and manual modes
+    st.session_state.part_number = None
+    st.session_state.part_type = None
+    st.session_state.selected_store = None
+    st.session_state.reset_values = True
 
-# Get valid part types for the selected part number
-valid_part_types = list(set(option["part_type"] for option in product_options if option["part_number"] == part_number))
-if valid_part_types:
-    # Set default part type if needed
-    if st.session_state.reset_values or st.session_state.part_type not in valid_part_types:
-        st.session_state.part_type = valid_part_types[0]
-        st.session_state.reset_values = False
-    
-    # Select part type
-    part_type = st.selectbox(
-        "Select Part Type", 
-        options=valid_part_types, 
-        index=valid_part_types.index(st.session_state.part_type) if st.session_state.part_type in valid_part_types else 0,
-        key="part_type_select",
-        on_change=on_part_type_change
+col1, col2 = st.columns([1,3])
+with col1:
+    # Radio button for selecting between demo data and manual entry
+    input_mode = st.radio(
+        "Select Input Mode",
+        options=["Use Demo Data", "Enter Part Details Manually"],
+        index=0 if st.session_state.input_mode == 'demo' else 1,
+        key="input_mode_radio",
+        on_change=on_input_mode_change
     )
     
-    # Get valid retailers for the selected part number and part type
-    valid_retailers = list(set(option["store_name"] for option in product_options 
-                            if option["part_number"] == part_number and option["part_type"] == part_type))
+    # Update session state
+    st.session_state.input_mode = 'demo' if input_mode == "Use Demo Data" else 'manual'
     
-    if valid_retailers:
-        # Set default retailer if needed
-        if st.session_state.selected_store not in valid_retailers:
-            st.session_state.selected_store = valid_retailers[0]
+    if st.session_state.input_mode == 'demo':
+        # Demo mode - select from predefined options
+        # Get unique part numbers to avoid duplicates in the dropdown
+        unique_part_numbers = list(set(option["part_number"] for option in product_options))
         
-        # Select retailer
-        selected_store = st.selectbox(
-            "Select Retailer", 
-            options=valid_retailers,
-            index=valid_retailers.index(st.session_state.selected_store) if st.session_state.selected_store in valid_retailers else 0,
-            key="retailer_select"
+        # Outside the form, select part number
+        part_number = st.selectbox(
+            "Select Part Number", 
+            options=unique_part_numbers, 
+            key="part_number_select",
+            on_change=on_part_number_change
         )
-        
-        # Update session state
-        st.session_state.selected_store = selected_store
+
+        # Get valid part types for the selected part number
+        valid_part_types = list(set(option["part_type"] for option in product_options if option["part_number"] == part_number))
+        if valid_part_types:
+            # Set default part type if needed
+            if st.session_state.reset_values or st.session_state.part_type not in valid_part_types:
+                st.session_state.part_type = valid_part_types[0]
+                st.session_state.reset_values = False
+            
+            # Select part type
+            part_type = st.selectbox(
+                f"Select Part Type (auto filled for `{part_number}`)", 
+                options=valid_part_types, 
+                index=valid_part_types.index(st.session_state.part_type) if st.session_state.part_type in valid_part_types else 0,
+                key="part_type_select",
+                on_change=on_part_type_change
+            )
+            
+            # Get valid retailers for the selected part number and part type
+            valid_retailers = list(set(option["store_name"] for option in product_options 
+                                    if option["part_number"] == part_number and option["part_type"] == part_type))
+            
+            if valid_retailers:
+                # Set default retailer if needed
+                if st.session_state.selected_store not in valid_retailers:
+                    st.session_state.selected_store = valid_retailers[0]
+                
+                # Select retailer
+                selected_store = st.selectbox(
+                    f"Select Retailer (selection filtered for `{part_number}`)", 
+                    options=valid_retailers,
+                    index=valid_retailers.index(st.session_state.selected_store) if st.session_state.selected_store in valid_retailers else 0,
+                    key="retailer_select"
+                )
+                
+                # Update session state
+                st.session_state.selected_store = selected_store
+            else:
+                st.warning("No retailers available for the selected part number and part type.")
+                selected_store = None
+        else:
+            st.warning("No part types available for the selected part number.")
+            part_type = None
+            selected_store = None
     else:
-        st.warning("No retailers available for the selected part number and part type.")
-        selected_store = None
-else:
-    st.warning("No part types available for the selected part number.")
-    part_type = None
-    selected_store = None
+        # Manual entry mode
+        part_number = st.text_input("Enter Part Number", key="manual_part_number")
+        part_type = st.text_input("Enter Part Type", key="manual_part_type")
+        
+        # Predefined list of retailers for manual mode
+        retailers = ["AutoZone", "Advanced Auto Parts", "O'Reillys", "Carparts", "Napa", "RockAuto"]
+        selected_store = st.selectbox("Select Retailer", options=retailers, key="manual_retailer_select")
+        
+        # Get retailer site based on the selected store
+        retailer_site_mapping = {
+            "AutoZone": "autozone.com",
+            "Advanced Auto Parts": "advancedautoparts.com",
+            "O'Reillys": "oreillyauto.com",
+            "Carparts": "carparts.com",
+            "Napa": "napaonline.com",
+            "RockAuto": "rockauto.com"
+        }
 
 # Search button
 if st.button("Search", key="search_button"):
     if part_number and selected_store and part_type:
-        # Get retailer site based on selected options
-        filtered_retailer_site = next((option["retailer_site"] for option in product_options 
-                                    if option["part_number"] == part_number 
-                                    and option["part_type"] == part_type 
-                                    and option["store_name"] == selected_store), "")
+        if st.session_state.input_mode == 'demo':
+            # Get retailer site based on selected options from demo data
+            filtered_retailer_site = next((option["retailer_site"] for option in product_options 
+                                        if option["part_number"] == part_number 
+                                        and option["part_type"] == part_type 
+                                        and option["store_name"] == selected_store), "")
+        else:
+            # Get retailer site from the mapping for manual mode
+            retailer_site_mapping = {
+                "AutoZone": "autozone.com",
+                "Advanced Auto Parts": "advancedautoparts.com",
+                "O'Reillys": "oreillyauto.com",
+                "Carparts": "carparts.com",
+                "Napa": "napaonline.com",
+                "RockAuto": "rockauto.com"
+            }
+            filtered_retailer_site = retailer_site_mapping.get(selected_store, "")
         
         if filtered_retailer_site:
             # Show searching notification
@@ -255,4 +338,6 @@ if st.button("Search", key="search_button"):
                 st.success(price)
         else:
             st.error("Could not find retailer site for the selected options.")
+    else:
+        st.error("Please fill in all required fields: Part Number, Part Type, and Retailer.")
 
