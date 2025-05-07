@@ -10,8 +10,21 @@ logger = logging.getLogger("ollama_client")
 
 class Ollama_Client:
     def __init__(self):
+        """Initialize the Ollama client"""
         self.OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
         self.DEFAULT_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2:latest")
+
+    # Function to fetch available Ollama models
+    def get_ollama_models(self,ollama_url):
+        """Fetch available models from Ollama server"""
+        try:
+            response = requests.get(f"{ollama_url}/api/tags")
+            if response.status_code == 200:
+                models = response.json().get("models", [])
+                return [model["name"] for model in models]
+            return ["llama2"]  # Default fallback
+        except Exception as e:
+            return ["llama2"]  # Default fallback
 
     def generate_with_ollama(self, prompt, model=None):
         """
