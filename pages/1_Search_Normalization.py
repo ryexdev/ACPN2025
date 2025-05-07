@@ -118,9 +118,10 @@ st.write("""Enter a query like '94 Civic front end' or '88 e30 blue smoke' below
 
 # Example buttons
 examples = [
-    "2010 Camry squeeling",
+    "2010 Camry squeelin",
     "F150 2015 blinker fluid",
-    "2005 BMW 5 idle rough and stalling"
+    "2005 BMW 5 idle rough and stalling",
+    "04 Vw Gulf Alt"
 ]
 
 st.write("Example Queries:")
