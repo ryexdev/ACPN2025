@@ -1,0 +1,18 @@
+services:
+  web:
+    build: .
+    container_name: acpn2025-app
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./classes/db:/app/classes/db
+      - ./.env:/app/.env
+    restart: unless-stopped
+    environment:
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_HEADLESS=true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501"]
+      interval: 30s
+      timeout: 10s
+      retries: 3 
