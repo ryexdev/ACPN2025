@@ -4,6 +4,16 @@ class PIES_Prompt_Builder:
         self.invalid_characters = ['<', '>', '&', '"', "'", '`', '#', '*', '_', '^', '~', '|', ':', ';', '/', '\\', '@', '$', '%', '+', '=', '{', '}', '[', ']', '(', ')']
         pass
 
+    def convert_language_code_to_name(self, language_code):
+        """Convert language code to language name"""
+        return {
+            "EN": "English",
+            "ES": "Spanish",
+            "FR": "French",
+            "DE": "German"
+        }.get(language_code, "English")
+    
+
     def get_pies_description_codes(self):
         """Return PIES description codes with explanations"""
         return {
@@ -74,7 +84,7 @@ class PIES_Prompt_Builder:
         return validation_results
 
     # Function to build PIES prompt
-    def build_pies_prompt(self, product_info, description_type):
+    def build_pies_prompt(self, product_info, description_type, language_code):
         """
         Build a prompt for the AI to generate a PIES-compliant product description
             
@@ -101,6 +111,9 @@ class PIES_Prompt_Builder:
         material = product_info.get('material', '')
         fitment = product_info.get('fitment', '')
         
+        # Convert language code to language name
+        language_name = self.convert_language_code_to_name(language_code)
+        
         # Map description types to their context
         description_contexts = self.get_pies_description_codes()
         
@@ -110,12 +123,12 @@ class PIES_Prompt_Builder:
         # Set max length based on description type
         max_lengths = self.get_pies_description_max_lengths()
         max_length = max_lengths.get(description_type, 255)
-        adjusted_max_length = max_length - (max_length * 0.1)
+        adjusted_max_length = max_length - (max_length * 0.2)
         
         # Build the base prompt
         prompt = f"""You are a professional automotive aftermarket content writer specializing in PIES-compliant product descriptions. It is extremely IMPORTANT that you should make sure that the description is not longer than {max_length} characters.
 
-        Write a {context} for part number {part_number}, which is a {product_category} from {brand}.
+Write a {context} for part number {part_number}, which is a {product_category} from {brand}. This must be written in {language_name}.
         """
         
         # Add part type if available
