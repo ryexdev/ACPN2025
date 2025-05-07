@@ -15,7 +15,7 @@ model_name = "gpt-4.1-nano"
 # Configure page settings
 st.set_page_config(
     page_title="Automotive Ad Generator",
-    page_icon="🚗",
+    page_icon="📃",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -135,13 +135,14 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Main title
-st.title("Automotive Ad Generator")
-st.markdown("""
-Generate professional, platform-optimized social media ads for automotive parts and accessories. 
-This tool uses AI to create engaging ad copy tailored to different social platforms (Instagram, LinkedIn, Facebook, etc.), 
-target audiences, and marketing styles. The output includes customized ad text, suggested hashtags, and formatting 
-specific to each platform's best practices.
-""")
+st.title("📃 Automotive Ad Generator")
+with st.expander("Description of Automotive Ad Generator", expanded=True):
+    st.markdown("""
+    Generate professional, platform-optimized social media ads for automotive parts and accessories. 
+    This tool uses AI to create engaging ad copy tailored to different social platforms (Instagram, LinkedIn, Facebook, etc.), 
+    target audiences, and marketing styles. The output includes customized ad text, suggested hashtags, and formatting 
+    specific to each platform's best practices.
+    """)
 
 # Get API key from environment variable or ask user to enter it
 if not secret_value:
