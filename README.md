@@ -88,7 +88,7 @@ export OwadmasdujU=your_openai_api_key
 
 Ryan leverages technology to enhance automotive aftermarket operations and improve customer experiences. With extensive experience in building technology solutions for the automotive industry, Ryan focuses on implementing AI-driven processes to streamline parts identification and inventory management.
 
-### Ryan Henderson
+### [Ryan Henderson]https://www.linkedin.com/in/ryan-andrew-henderson/
 **Head of Data and Catalog**
 **CarParts.com**
 
