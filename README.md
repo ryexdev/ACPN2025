@@ -51,8 +51,8 @@ Key benefits of this architecture:
 
 1. Clone this repository:
    ```
-   git clone https://github.com/yourusername/automotive-ai-tools.git
-   cd automotive-ai-tools
+   git clone https://github.com/ryexdev/ACPN2025.git
+   cd ACPN2025
    ```
 
 2. Install the required dependencies:
