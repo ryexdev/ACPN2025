@@ -11,7 +11,6 @@ from classes.ai_engines.ollama_client import ollama_client
 from classes.db import db
 
 # Ollama API key (Check README.md for more information)
-# secret_value = None
 secret_value = os.getenv("OwadmasdujU")
 model_source = "OpenAI"
 model_name = "gpt-4.1-nano"

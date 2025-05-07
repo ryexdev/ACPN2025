@@ -3,7 +3,6 @@ from openai import OpenAI
 import os
 
 # Get API key from environment variable
-# secret_value = None
 secret_value = os.getenv("OwadmasdujU")
 model_name = "gpt-4o"
 

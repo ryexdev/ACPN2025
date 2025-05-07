@@ -20,8 +20,7 @@ st.set_page_config(
 )
 
 # Get API key from environment variable or ask user
-secret_value = None
-# secret_value = os.getenv("OwadmasdujU")
+secret_value = os.getenv("OwadmasdujU")
 model_name = "gpt-4.1-nano"
 
 # Title and description

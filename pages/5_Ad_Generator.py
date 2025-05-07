@@ -8,7 +8,6 @@ from PIL import Image
 import random
 
 # Get API key from environment variable or ask user
-# secret_value = None
 secret_value = os.getenv("OwadmasdujU")
 model_name = "gpt-4.1-nano"
 
