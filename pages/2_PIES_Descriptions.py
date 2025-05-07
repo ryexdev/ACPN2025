@@ -24,7 +24,7 @@ ollama_inactive = True
 # Page configuration
 st.set_page_config(
     page_title="PIES Description Builder",
-    page_icon="🚗",
+    page_icon="📑",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -46,8 +46,8 @@ def generate_description(prompt, model_source, model_name, api_key=None, ollama_
 
 
 # Main application
-st.title("PIES Description Builder")
-with st.expander("Description of PIES Description Builder"):
+st.title("📑 PIES Description Builder")
+with st.expander("Description of PIES Description Builder", expanded=True):
     st.markdown(f"""
     This tool helps you generate professional product descriptions that comply with Auto Care PIES (Product Information Exchange Standard) requirements using AI technology.
 
