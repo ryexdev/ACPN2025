@@ -4,20 +4,16 @@ import os
 
 # Get API key from environment variable
 secret_value = os.getenv("OwadmasdujU")
-model_name = "gpt-4o"
+model_name = "gpt-4.1-nano"
 
-# Set up the page configuration
-st.set_page_config(
-    page_title="AI Price Collection", 
-    page_icon="💵",
-    layout="wide"
-)
-
-# Title and description
-st.title("💵 AI Price Collection")
-with st.expander("Description of AI Price Collection", expanded=True):
+#---------------- Header with API control --------------
+pagename = "AI Price Collection"
+pageicon = "💵"
+st.set_page_config(page_title=pagename, layout="wide",page_icon=pageicon)
+st.subheader(f"{pageicon} {pagename}")
+with st.expander(f"Description of {pagename}", expanded=False):
     st.markdown("""
-    This tool helps you collect and compare prices for automotive parts across multiple online retailers using AI technology. You can:
+This tool helps you collect and compare prices for automotive parts across multiple online retailers using AI technology. You can:
 
     - Search for specific part numbers across major auto parts retailers
     - Get real-time price comparisons from different websites
@@ -25,26 +21,35 @@ with st.expander("Description of AI Price Collection", expanded=True):
     - Track price history and identify the best deals
     - Export price data for analysis and reporting
 
-    The AI-powered search ensures accurate price matching and helps you find the best deals for your automotive parts needs.
-    """)
-
-# Get API key from environment variable or ask user
-if not secret_value:
-    with st.container(border=True):
-        st.subheader("OpenAI API Key")
-        st.warning("API key is not set. Please enter your API key below to continue to use the tool.")
-        secret_value = st.text_input("Enter your OpenAI API key", type="password")
-        # Model selection
-        model_name = st.selectbox(
-            "Select OpenAI Model (selected model required for the tool to work):", 
-            ["gpt-4o"],
-            index=0,
-            disabled=True
-        )
+The AI-powered search ensures accurate price matching and helps you find the best deals for your automotive parts needs.
+""")
+#API Key Control
+if 'openai_api_key' not in st.session_state:
+    st.session_state['openai_api_key'] = None
+secret_value = os.getenv("OwadmasdujU")
+if secret_value:
+    st.success("OpenAI API key has been provided until EOD 5/14/2025")
+    api_key = secret_value
+    st.session_state['openai_api_key'] = secret_value
+elif st.session_state['openai_api_key']:
+    col1, col2 = st.columns([5, 1])
+    with col1:
+        st.success("Using user-provided OpenAI API key")
+    with col2:
+        if st.button("Clear Key", type="secondary", use_container_width=True):
+            st.session_state['openai_api_key'] = None
+            st.rerun()
+    api_key = st.session_state['openai_api_key']
 else:
-    st.success("OpenAI API key has been provided for the demo. You can freely use the tool until the API key expires (estimated 2025-05-14 @ 12:00 MST).")
-    open_ai_api_key = secret_value
+    with st.container(border=True):
+        st.warning("Please enter your [OpenAI API key](https://openai.com/api/).")
+        api_key_input = st.text_input("Enter your API key:", type="password")
+        if api_key_input:
+            st.session_state['openai_api_key'] = api_key_input
+        api_key = st.session_state['openai_api_key']
 
+st.divider()
+#-----------------------------------------------------------
 
 def search_openai_for_price(part_number, retailer_site, part_type):
     # Create a container for logs

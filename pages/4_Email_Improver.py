@@ -2,17 +2,54 @@ import streamlit as st
 import os
 from classes.ai_engines.openai_client import openai_client
 
-# Page configuration
-st.set_page_config(
-    page_title="Professional Email Improver",
-    page_icon="✉️",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
-
-# Get API key from environment variable
+#API Key Control and model selection
 secret_value = os.getenv("OwadmasdujU")
 model_name = "gpt-4.1-nano"
+
+#---------------- Header with API control --------------
+pagename = "Professional Email Improver"
+pageicon = "✉️"
+st.set_page_config(page_title=pagename, layout="wide",page_icon=pageicon)
+st.subheader(f"{pageicon} {pagename}")
+with st.expander(f"Description of {pagename}", expanded=False):
+    st.markdown("""
+    Transform your basic emails into professional, warm, and personalized communications. This tool helps you:
+
+- Enhance your email tone and professionalism while maintaining warmth
+- Improve clarity and structure of your messages
+- Add personalized touches to make your emails more engaging
+- Get suggestions for better word choices and phrasing
+- Create more effective business communications
+
+Choose from sample scenarios or input your own email to get AI-powered improvements tailored to your needs.
+""")
+#API Key Control
+if 'openai_api_key' not in st.session_state:
+    st.session_state['openai_api_key'] = None
+secret_value = os.getenv("OwadmasdujU")
+if secret_value:
+    st.success("OpenAI API key has been provided until EOD 5/14/2025")
+    api_key = secret_value
+    st.session_state['openai_api_key'] = secret_value
+elif st.session_state['openai_api_key']:
+    col1, col2 = st.columns([5, 1])
+    with col1:
+        st.success("Using user-provided OpenAI API key")
+    with col2:
+        if st.button("Clear Key", type="secondary", use_container_width=True):
+            st.session_state['openai_api_key'] = None
+            st.rerun()
+    api_key = st.session_state['openai_api_key']
+else:
+    with st.container(border=True):
+        st.warning("Please enter your [OpenAI API key](https://openai.com/api/).")
+        api_key_input = st.text_input("Enter your API key:", type="password")
+        if api_key_input:
+            st.session_state['openai_api_key'] = api_key_input
+        api_key = st.session_state['openai_api_key']
+
+st.divider()
+#-----------------------------------------------------------
 
 # Sample data
 SAMPLE_QUESTIONS_AND_EMAILS = {
@@ -45,42 +82,8 @@ def improve_email(email_text, model_name, api_key):
         st.error(f"Error improving email: {e}")
         return None
 
-# Main application
-st.title("✉️ Professional Email Improver")
-with st.expander("Description of Professional Email Improver", expanded=True):
-    st.markdown("""
-        Transform your basic emails into professional, warm, and personalized communications. This tool helps you:
-
-    - Enhance your email tone and professionalism while maintaining warmth
-    - Improve clarity and structure of your messages
-    - Add personalized touches to make your emails more engaging
-    - Get suggestions for better word choices and phrasing
-    - Create more effective business communications
-
-    Choose from sample scenarios or input your own email to get AI-powered improvements tailored to your needs.
-    """)
-
-# Get API key from environment variable or ask user
-if not secret_value:
-    with st.container(border=True):
-        st.subheader("OpenAI API Key")
-        st.warning("API key is not set. Please enter your API key below to continue to use the tool.")
-        secret_value = st.text_input("Enter your OpenAI API key", type="password")
-        # Model selection
-        model_name = st.selectbox(
-            "Select OpenAI Model (selected model required for the tool to work):", 
-            ["gpt-4o"],
-            index=0,
-            disabled=True
-        )
-else:
-    st.success("OpenAI API key has been provided for the demo. You can freely use the tool until the API key expires (estimated 2025-05-14 @ 12:00 MST).")
-    api_key = secret_value
-
-st.divider()
-
 # Main content
-st.header("Email Selection")
+st.subheader("Email Selection")
 # Selection options: either pick a sample or write custom
 input_option = st.radio(
     "Select an option:",
@@ -129,7 +132,7 @@ if st.button("Improve Email", key="improve_email_button"):
             
             if improved_email:
                 # Display results side by side
-                st.header("Results")
+                st.subheader("Results")
                 
                 col1, col2 = st.columns(2)
                 

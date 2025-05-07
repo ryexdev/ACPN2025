@@ -7,17 +7,49 @@ import base64
 from PIL import Image
 import random
 
-# Get API key from environment variable or ask user
+# API Key Control and model selection
 secret_value = os.getenv("OwadmasdujU")
 model_name = "gpt-4.1-nano"
 
-# Configure page settings
-st.set_page_config(
-    page_title="Automotive Ad Generator",
-    page_icon="📃",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+#---------------- Header with API control --------------
+pagename = "Automotive Ad Generator"
+pageicon = "📃"
+st.set_page_config(page_title=pagename, layout="wide",page_icon=pageicon)
+st.subheader(f"{pageicon} {pagename}")
+with st.expander(f"Description of {pagename}", expanded=False):
+    st.markdown("""
+Generate professional, platform-optimized social media ads for automotive parts and accessories. 
+This tool uses AI to create engaging ad copy tailored to different social platforms (Instagram, LinkedIn, Facebook, etc.), 
+target audiences, and marketing styles. The output includes customized ad text, suggested hashtags, and formatting 
+specific to each platform's best practices.
+""")
+#API Key Control
+if 'openai_api_key' not in st.session_state:
+    st.session_state['openai_api_key'] = None
+secret_value = os.getenv("OwadmasdujU")
+if secret_value:
+    st.success("OpenAI API key has been provided until EOD 5/14/2025")
+    api_key = secret_value
+    st.session_state['openai_api_key'] = secret_value
+elif st.session_state['openai_api_key']:
+    col1, col2 = st.columns([5, 1])
+    with col1:
+        st.success("Using user-provided OpenAI API key")
+    with col2:
+        if st.button("Clear Key", type="secondary", use_container_width=True):
+            st.session_state['openai_api_key'] = None
+            st.rerun()
+    api_key = st.session_state['openai_api_key']
+else:
+    with st.container(border=True):
+        st.warning("Please enter your [OpenAI API key](https://openai.com/api/).")
+        api_key_input = st.text_input("Enter your API key:", type="password")
+        if api_key_input:
+            st.session_state['openai_api_key'] = api_key_input
+        api_key = st.session_state['openai_api_key']
+
+st.divider()
+#-----------------------------------------------------------
 
 # Custom CSS for better styling
 st.markdown("""
@@ -133,31 +165,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Main title
-st.title("📃 Automotive Ad Generator")
-with st.expander("Description of Automotive Ad Generator", expanded=True):
-    st.markdown("""
-    Generate professional, platform-optimized social media ads for automotive parts and accessories. 
-    This tool uses AI to create engaging ad copy tailored to different social platforms (Instagram, LinkedIn, Facebook, etc.), 
-    target audiences, and marketing styles. The output includes customized ad text, suggested hashtags, and formatting 
-    specific to each platform's best practices.
-    """)
-
-# Get API key from environment variable or ask user to enter it
-if not secret_value:
-    with st.container(border=True):
-        st.subheader("OpenAI API Key")
-        st.warning("API key is not set. Please enter your API key below to continue to use the tool.")
-        api_key = st.text_input("Enter your API key:", type="password")
-        model_name = st.selectbox(
-            "Select OpenAI Model:", 
-            ["gpt-4.1-nano", "gpt-4o-mini"],
-            index=0
-        )
-else:
-    st.success("OpenAI API key has been provided for the demo. You can freely use the tool until the API key expires (estimated 2025-05-14 @ 12:00 MST).")
-    api_key = secret_value
-
 # Example options for demonstration
 options = [
     {"PartType":"Ignition Coil", "Brand": "Bosch", "Style": "Funny", "Platform": "Instagram", "Audience": "DIY Mechanics", "Max Length": 375},
@@ -169,8 +176,6 @@ options = [
     {"PartType":"Brake Caliper", "Brand": "Cardone", "Style": "Funny", "Platform": "Facebook", "Audience": "General Public", "Max Length": 400},
     {"PartType":"Brake Line", "Brand": "Dorman", "Style": "Funny", "Platform": "TikTok", "Audience": "Car Enthusiasts", "Max Length": 450}
 ]
-
-st.divider()
 
 # Part information input
 st.header("Ad Information")
