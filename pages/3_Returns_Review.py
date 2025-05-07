@@ -3,18 +3,34 @@ import json
 import requests
 import os
 
-# Configure page settings
-st.set_page_config(page_title="Reviews", layout="wide",page_icon="🧑‍🔧")
+#---------------- Header with API control --------------
+pagename = "Returns Review"
+st.set_page_config(page_title=pagename, layout="wide",page_icon="🧑‍🔧")
+st.subheader(f"📃 {pagename}")
+with st.expander("Description of Review Fitment Analyzer", expanded=False):
+    st.markdown("""
+This tool helps identify potential **fitment or compatibility issues** in customer product reviews for automotive parts. It leverages AI to extract and summarize recurring problems related to part compatibility by analyzing unstructured review text. You can:
 
-# Header and description
-st.info("🤖💬 Identify and flag recurring fitment issues reported in customer reviews or support interactions")
+- Detect patterns of installation or fitment issues tied to specific vehicle year/make/model/submodel
+- Identify misleading catalog data (e.g., parts listed as compatible but consistently reported as not fitting)
+- Support catalog correction and improve part listings
+- Understand which submodels (e.g., SE vs. Titanium) are affected
+- View confidence levels based on how frequently a problem is mentioned
 
-# Get API key from user input
+Just paste or edit a set of customer reviews, and click **Analyze Reviews** to generate an AI-powered summary of key issues and affected vehicles.
+""")
 secret_value = os.getenv("OwadmasdujU")
+model_name = "gpt-4.1-nano"
 if not secret_value:
-    api_key = st.text_input("Enter your API key:", type="password")
+    with st.container(border=True):
+        st.warning("Please enter your [OpenAI API key](https://openai.com/api/).")
+        api_key = st.text_input("Enter your API key:", type="password")
 else:
+    st.success("OpenAI API key has been provided until EOD 5/14/2025")
     api_key = secret_value
+st.divider()
+#-----------------------------------------------------------
+
 
 # Pre-populated reviews in a single text block
 default_reviews = """Great quality hub assembly for my 2018 Ford Escape. Easy installation and perfect fit.

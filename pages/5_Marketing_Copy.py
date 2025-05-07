@@ -3,18 +3,34 @@ import json
 import requests
 import os
 
-# Configure page settings
-st.set_page_config(page_title="Description Rewriter", layout="wide", page_icon="🚗")
+#---------------- Header with API control --------------
+pagename = "Marketing Copy"
+st.set_page_config(page_title=pagename, layout="wide",page_icon="💹")
+st.subheader(f"📃 {pagename}")
+with st.expander("Description of Marketing Copy Generator", expanded=False):
+    st.markdown("""
+This tool transforms raw supplier descriptions of auto parts into clear, customer-friendly **marketing copy**. It uses AI to convert technical or unstructured product data into standardized, engaging content that improves online catalog quality. You can:
 
-# Header and description
-st.info("🤖💬 Transform technical supplier descriptions into clear, standardized marketing copy that highlights key product attributes and fitment details")
+- Automatically generate titles, descriptions, fitment notes, and feature lists
+- Standardize terminology and highlight compatibility with specific vehicles
+- Improve readability and SEO value of product listings
+- Clearly communicate features, specifications, and benefits to customers
+- Ensure important fitment details are preserved (e.g., drivetrain, bolt pattern)
 
-# Get API key from user input
+Paste in a supplier-provided description and click **Rewrite Description** to instantly produce professional content ready for eCommerce.
+""")
 secret_value = os.getenv("OwadmasdujU")
+model_name = "gpt-4.1-nano"
 if not secret_value:
-    api_key = st.text_input("Enter your API key:", type="password")
+    with st.container(border=True):
+        st.warning("Please enter your [OpenAI API key](https://openai.com/api/).")
+        api_key = st.text_input("Enter your API key:", type="password")
 else:
+    st.success("OpenAI API key has been provided until EOD 5/14/2025")
     api_key = secret_value
+st.divider()
+#-----------------------------------------------------------
+
 
 # Pre-populated sample descriptions
 default_description = """FRONT WHEEL HUB AND BEARING ASSEMBLY

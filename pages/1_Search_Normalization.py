@@ -3,36 +3,33 @@ import json
 import requests
 import os
 
-#------------ Header with API control ------------
-# Configure page settings
-st.set_page_config(page_title="Search Normalization", layout="wide",page_icon="🔍")
-
-st.subheader("🔍 Search Normalization")
+#---------------- Header with API control --------------
+pagename = "Search Normalization"
+st.set_page_config(page_title=pagename, layout="wide",page_icon="🧑‍🔧")
+st.subheader(f"📃 {pagename}")
 with st.expander("Description of Search Normalization", expanded=False):
     st.markdown("""
-        This tool helps you convert customer search queries into standardized automotive terminology. You can:
+This tool helps you convert customer search queries into standardized automotive terminology. You can:
 
-        - Transform casual or slang terms into proper automotive part names
-        - Convert vehicle descriptions into structured data (year, make, model)
-        - Identify parts based on symptoms or vague descriptions
-        - Standardize search terms for better results in parts catalogs
-        - Improve search accuracy by normalizing common variations
+- Transform casual or slang terms into proper automotive part names
+- Convert vehicle descriptions into structured data (year, make, model)
+- Identify parts based on symptoms or vague descriptions
+- Standardize search terms for better results in parts catalogs
+- Improve search accuracy by normalizing common variations
 
-        Whether customers search using technical terms, common names, or symptoms, this tool helps ensure they find the exact parts they need.
-    """)
-
+Whether customers search using technical terms, common names, or symptoms, this tool helps ensure they find the exact parts they need.
+""")
 secret_value = os.getenv("OwadmasdujU")
 model_name = "gpt-4.1-nano"
-
 if not secret_value:
     with st.container(border=True):
-        st.subheader("OpenAI API Key")
         st.warning("Please enter your [OpenAI API key](https://openai.com/api/).")
         api_key = st.text_input("Enter your API key:", type="password")
 else:
     st.success("OpenAI API key has been provided until EOD 5/14/2025")
     api_key = secret_value
 st.divider()
+#-----------------------------------------------------------
 
 # Function to call OpenAI API with GPT-4.1 Nano
 def query_openai(prompt: str, api_key: str):
