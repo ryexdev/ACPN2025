@@ -65,6 +65,29 @@ Key benefits of this architecture:
    streamlit run Home.py
    ```
 
+### Running with Docker
+
+You can also run this application using Docker:
+
+1. Make sure you have Docker and Docker Compose installed on your system.
+
+2. Create a `.env` file from the sample (replace with your actual API key):
+   ```
+   cp sample.env .env
+   ```
+
+3. Build and start the Docker container:
+   ```
+   docker-compose up -d
+   ```
+
+4. Access the application through your web browser at http://localhost:8501
+
+5. To stop the container:
+   ```
+   docker-compose down
+   ```
+
 ### Usage
 
 1. Access the application through your web browser (typically at http://localhost:8501)
