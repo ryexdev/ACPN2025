@@ -4,7 +4,7 @@ import os
 
 # Get API key from environment variable
 secret_value = os.getenv("OwadmasdujU")
-model_name = "gpt-4.1-nano"
+model_name = "gpt-4o"
 
 #---------------- Header with API control --------------
 pagename = "AI Price Collection"
