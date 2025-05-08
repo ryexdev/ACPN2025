@@ -3,6 +3,9 @@ import json
 import requests
 import os
 
+# Variables
+model_name = os.getenv("OPENAI_MODEL")
+
 #---------------- Header with API control --------------
 pagename = "Returns Review"
 pageicon = "🛠"
@@ -39,7 +42,7 @@ elif st.session_state['openai_api_key']:
     api_key = st.session_state['openai_api_key']
 else:
     with st.container(border=True):
-        st.warning("Please enter your [OpenAI API key](https://openai.com/api/).")
+        st.warning("Please enter your [OpenAI API key](https://platform.openai.com/api-key). Tutorial: [How to get your OpenAI API key](https://www.youtube.com/watch?v=SzPE_AE0eEo)")
         api_key_input = st.text_input("Enter your API key:", type="password")
         if api_key_input:
             st.session_state['openai_api_key'] = api_key_input
@@ -124,8 +127,7 @@ def detect_fitment_issues(reviews_text: str, api_key: str):
     }
     
     payload = {
-        "model": "gpt-4.1-nano",
-        #"model": "gpt-4o-mini",
+        "model": model_name,
         "messages": [
             {
                 "role": "system", 
