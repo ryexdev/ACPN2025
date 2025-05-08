@@ -3,8 +3,7 @@ from openai import OpenAI
 import os
 
 # Get API key from environment variable
-secret_value = os.getenv("OwadmasdujU")
-model_name = "gpt-4o"
+model_name = os.getenv("OPENAI_MODEL")
 
 #---------------- Header with API control --------------
 pagename = "AI Price Collection"
@@ -26,7 +25,7 @@ The AI-powered search ensures accurate price matching and helps you find the bes
 #API Key Control
 if 'openai_api_key' not in st.session_state:
     st.session_state['openai_api_key'] = None
-secret_value = os.getenv("OwadmasdujU")
+secret_value = None
 if secret_value:
     st.success("OpenAI API key has been provided until EOD 5/14/2025")
     api_key = secret_value
@@ -42,7 +41,8 @@ elif st.session_state['openai_api_key']:
     api_key = st.session_state['openai_api_key']
 else:
     with st.container(border=True):
-        st.warning("Please enter your [OpenAI API key](https://openai.com/api/).")
+        st.info("This demo uses OpenAI's advanced gpt-4o model and their web_search_preview tool. Due to the cutting edge functionality OpenAI's cost is higher than other models. Unfortunately, this demo cannot be provided for free. Please enter your API key to continue.")
+        st.warning("Please enter your [OpenAI API key](https://platform.openai.com/api-key). Tutorial: [How to get your OpenAI API key](https://www.youtube.com/watch?v=SzPE_AE0eEo)")
         api_key_input = st.text_input("Enter your API key:", type="password")
         if api_key_input:
             st.session_state['openai_api_key'] = api_key_input
@@ -345,3 +345,18 @@ if st.button("Search", key="search_button"):
     else:
         st.error("Please fill in all required fields: Part Number, Part Type, and Retailer.")
 
+st.divider()
+
+# Example Result of the API call
+st.subheader("Example Result of the API call")
+st.markdown("""
+<div data-testid="stMarkdownContainer" class="st-emotion-cache-seewz2 e194bff00" style="width: 100%;"><p>The Bosch ICON 22-inch Wiper Blade (Part #22A) is available on AutoZone's website for $31.99. (<a href="https://www.autozone.com/ignition-tune-up-and-routine-maintenance/wiper-blade-windshield/p/bosch-icon-22in-wiper-blade/761545_0_0?utm_source=openai" target="_blank" rel="noopener noreferrer">autozone.com</a>)</p>
+<p><strong>Product Details:</strong></p>
+<ul>
+<li><strong>Part Number:</strong> 22A</li>
+<li><strong>Brand:</strong> Bosch</li>
+<li><strong>Price:</strong> $31.99</li>
+<li><strong>Product Link:</strong> <a href="https://www.autozone.com/ignition-tune-up-and-routine-maintenance/wiper-blade-windshield/p/bosch-icon-22in-wiper-blade/761545_0_0" target="_blank" rel="noopener noreferrer">Bosch ICON 22in Wiper Blade at AutoZone</a></li>
+</ul>
+<p>Please note that prices and availability are subject to change. It's advisable to check the provided link for the most current information.</p></div>
+""", unsafe_allow_html=True)
