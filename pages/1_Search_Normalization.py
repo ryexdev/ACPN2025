@@ -3,6 +3,9 @@ import json
 import requests
 import os
 
+# Variables
+model_name = os.getenv("OPENAI_MODEL")
+
 #---------------- Header with API control --------------
 pagename = "Search Normalization"
 pageicon = "🔍"
@@ -39,7 +42,7 @@ elif st.session_state['openai_api_key']:
     api_key = st.session_state['openai_api_key']
 else:
     with st.container(border=True):
-        st.warning("Please enter your [OpenAI API key](https://openai.com/api/).")
+        st.warning("Please enter your [OpenAI API key](https://platform.openai.com/api-key). Tutorial: [How to get your OpenAI API key](https://www.youtube.com/watch?v=SzPE_AE0eEo)")
         api_key_input = st.text_input("Enter your API key:", type="password")
         if api_key_input:
             st.session_state['openai_api_key'] = api_key_input
@@ -48,7 +51,7 @@ else:
 st.divider()
 #-----------------------------------------------------------
 
-# Function to call OpenAI API with GPT-4.1 Nano
+# Function to call OpenAI API with model_name
 def query_openai(prompt: str, api_key: str):
     # Create a detailed system prompt for accurate auto parts normalization
     system_prompt = """You are a search engine for auto parts. Take a search query and normalize it to a JSON object with the following fields:
@@ -75,7 +78,7 @@ def query_openai(prompt: str, api_key: str):
     }
     
     payload = {
-        "model": "gpt-4.1-nano",
+        "model": model_name,
         "messages": [
             {
                 "role": "system", 
