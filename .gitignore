@@ -6,9 +6,6 @@ venv/
 # Environment Variables
 .env
 
-# Streamlit
-.streamlit
-
 # Streamlit Cache
 .streamlit/secrets.toml
 

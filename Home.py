@@ -2,12 +2,16 @@ import streamlit as st
 import requests
 import classes.db.initalize_database as initialize_database
 from utils import load_environment
+import os
 
 # Load environment variables from .env file
-load_environment()
+if os.path.exists(".env"):
+    load_environment()
 
-# Initialize the database
-initialize_database.InitializeDatabase().create_database()
+db_path = "/workspaces/ACPN2025/classes/db/pies.db"
+
+if not os.path.exists(db_path):
+    initialize_database.InitializeDatabase().create_database()
 
 # Set page configuration
 st.set_page_config(
