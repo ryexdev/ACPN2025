@@ -5,9 +5,10 @@ import pandas as pd
 import requests
 import time
 
+# Variables
 ollama_inactive = True
 model_source = "OpenAI"
-model_name = "gpt-4.1-nano"
+model_name = os.getenv("OPENAI_MODEL")
 
 #---------------- Header with API control --------------
 pagename = "PIES Description Builder"
@@ -45,7 +46,7 @@ elif st.session_state['openai_api_key']:
     api_key = st.session_state['openai_api_key']
 else:
     with st.container(border=True):
-        st.warning("Please enter your [OpenAI API key](https://openai.com/api/).")
+        st.warning("Please enter your [OpenAI API key](https://platform.openai.com/api-key). Tutorial: [How to get your OpenAI API key](https://www.youtube.com/watch?v=SzPE_AE0eEo)")
         api_key_input = st.text_input("Enter your API key:", type="password")
         if api_key_input:
             st.session_state['openai_api_key'] = api_key_input
