@@ -66,7 +66,7 @@ def search_openai_for_price(part_number, retailer_site, part_type):
         st.write(f"Search Query: {search_query}")
     
     # Initialize OpenAI client
-    client = OpenAI(api_key=open_ai_api_key)
+    client = OpenAI(api_key=api_key)
     
     try:
         with log_container:
