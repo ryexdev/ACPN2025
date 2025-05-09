@@ -9,6 +9,7 @@ import time
 ollama_inactive = True
 model_source = "OpenAI"
 model_name = os.getenv("OPENAI_MODEL")
+ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434")  # Default Ollama URL
 
 #---------------- Header with API control --------------
 pagename = "PIES Description Builder"
@@ -130,6 +131,69 @@ def generate_description(prompt, model_source, model_name, api_key=None, ollama_
     except Exception as e:
         st.error(f"Error generating description: {e}")
         return None
+
+def check_and_shorten_description(description, description_type, model_source, model_name, api_key=None, ollama_url=None, max_retries=5):
+    """
+    Check if description length is within limits and request shorter descriptions if needed.
+    
+    Args:
+        description (str): The generated description
+        description_type (str): PIES description code
+        model_source (str): Either 'OpenAI' or 'Ollama'
+        model_name (str): The model name to use
+        api_key (str, optional): OpenAI API key
+        ollama_url (str, optional): Ollama server URL
+        max_retries (int): Maximum number of retry attempts
+        
+    Returns:
+        str: The final description (may be shortened)
+    """
+    if not description:
+        return None
+    
+    # Get max length for this description type
+    max_lengths = pies_prompt_builder.get_pies_description_max_lengths()
+    max_length = max_lengths.get(description_type, 255)
+    
+    # Check if description is too long
+    retry_count = 0
+    current_desc = description
+    
+    while len(current_desc) > max_length and retry_count < max_retries:
+        # Create a prompt asking to shorten the description
+        shorten_prompt = f"""
+The following description for a {description_type} is too long. It is {len(current_desc)} characters, 
+but must be no more than {max_length} characters.
+
+Original description:
+{current_desc}
+
+Please rewrite this to be more concise while retaining the key information. 
+Your response must be ONLY the shortened description text, and MUST be under {max_length} characters.
+"""
+        
+        retry_count += 1
+        st.warning(f"Description exceeds maximum length. Attempting to shorten it (Attempt {retry_count}/{max_retries})...")
+        
+        # Request a shorter version
+        with st.spinner(f"Shortening description (attempt {retry_count}/{max_retries})..."):
+            if model_source == 'OpenAI':
+                shorter_desc = openai_client.generate_with_openai(shorten_prompt, model_name)
+            else:
+                shorter_desc = ollama_client.generate_with_ollama(shorten_prompt, model_name)
+            
+            # Clean up invalid characters
+            if shorter_desc:
+                for char in pies_prompt_builder.invalid_characters:
+                    shorter_desc = shorter_desc.replace(char, "")
+                current_desc = shorter_desc
+            
+            # If we got back an empty response or error, break the loop
+            if not shorter_desc or "Error" in shorter_desc:
+                break
+    
+    # Return the final description, even if it's still too long after max retries
+    return current_desc
 
 # LLM Connection Configuration
 if not ollama_inactive:
@@ -318,6 +382,17 @@ if generate_button and product_info.get("product_category"):
             description = description.replace(char, "")
         
         if description:
+            # Check and shorten description if it exceeds max length
+            description = check_and_shorten_description(
+                description, 
+                description_type, 
+                model_source, 
+                model_name, 
+                api_key=api_key, 
+                ollama_url=ollama_url,
+                max_retries=5
+            )
+            
             # Store in session state
             if "descriptions" not in st.session_state:
                 st.session_state.descriptions = []

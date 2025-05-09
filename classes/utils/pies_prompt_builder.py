@@ -280,12 +280,10 @@ For this CONDENSED DESCRIPTION:
         elif description_type == "ALT_NAMES":
             prompt += f"""
 For this ALTERNATE NAMES:
-1. Provide alternate names or search-friendly terms for the product
-2. Include common industry variations in terminology
-3. Focus on terms customers might use when searching
-4. Keep each term accurate and relevant
-5. Be extremely concise (under {adjusted_max_length} characters)
-6. Do not include any fitment information
+1. Provide alternate names or search-friendly terms for the product (synonyms)
+2. Take the part type and find common industry variations of the part type and bring them back in a comma separated list.
+3. Be extremely concise (under {adjusted_max_length} characters)
+4. IMPORTANT: This should be a comma separated list of single words or small phrases.
             """
         elif description_type == "TITLE_DESC":
             prompt += f"""
