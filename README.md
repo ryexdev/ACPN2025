@@ -43,7 +43,7 @@ Key benefits of this architecture:
 ### Prerequisites
 
 - Python 3.8 or higher
-- A valid OpenAI API key
+- A valid OpenAI API key (YouTube Tutorial: [How to get your OpenAI API key](https://www.youtube.com/watch?v=SzPE_AE0eEo))
 
 ### Installation
 
