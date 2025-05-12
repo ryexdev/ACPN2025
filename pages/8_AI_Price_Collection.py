@@ -3,7 +3,7 @@ from openai import OpenAI
 import os
 
 # Get API key from environment variable
-model_name = os.getenv("OPENAI_MODEL")
+model_name = os.getenv("OPENAI_MODEL", "gpt-4o")
 
 #---------------- Header with API control --------------
 pagename = "AI Price Collection"
@@ -23,30 +23,30 @@ This tool helps you collect and compare prices for automotive parts across multi
 The AI-powered search ensures accurate price matching and helps you find the best deals for your automotive parts needs.
 """)
 #API Key Control
-if 'openai_api_key' not in st.session_state:
-    st.session_state['openai_api_key'] = None
+if 'openai_4o_api_key' not in st.session_state:
+    st.session_state['openai_4o_api_key'] = None
 secret_value = None
 if secret_value:
     st.success("OpenAI API key has been provided until EOD 5/14/2025")
     api_key = secret_value
-    st.session_state['openai_api_key'] = secret_value
-elif st.session_state['openai_api_key']:
+    st.session_state['openai_4o_api_key'] = secret_value
+elif st.session_state['openai_4o_api_key']:
     col1, col2 = st.columns([5, 1])
     with col1:
         st.success("Using user-provided OpenAI API key")
     with col2:
         if st.button("Clear Key", type="secondary", use_container_width=True):
-            st.session_state['openai_api_key'] = None
+            st.session_state['openai_4o_api_key'] = None
             st.rerun()
-    api_key = st.session_state['openai_api_key']
+    api_key = st.session_state['openai_4o_api_key']
 else:
     with st.container(border=True):
         st.info("This demo uses OpenAI's advanced gpt-4o model and their web_search_preview tool. Due to the cutting edge functionality OpenAI's cost is higher than other models. Unfortunately, this demo cannot be provided for free. Please enter your API key to continue.")
         st.warning("Please enter your [OpenAI API key](https://platform.openai.com/api-key). Tutorial: [How to get your OpenAI API key](https://www.youtube.com/watch?v=SzPE_AE0eEo)")
         api_key_input = st.text_input("Enter your API key:", type="password")
         if api_key_input:
-            st.session_state['openai_api_key'] = api_key_input
-        api_key = st.session_state['openai_api_key']
+            st.session_state['openai_4o_api_key'] = api_key_input
+        api_key = st.session_state['openai_4o_api_key']
 
 st.divider()
 #-----------------------------------------------------------
