@@ -33,7 +33,7 @@ if 'openai_api_key' not in st.session_state:
     st.session_state['openai_api_key'] = None
 secret_value = os.getenv("OwadmasdujU")
 if secret_value:
-    st.success("OpenAI API key has been provided until EOD 5/14/2025")
+    st.success("OpenAI API key has been provided for free use.")
     api_key = secret_value
     st.session_state['openai_api_key'] = secret_value
 elif st.session_state['openai_api_key']:
