@@ -17,7 +17,7 @@ if not os.path.exists(db_path):
 st.set_page_config(
     page_title="Ryan²", 
     layout="wide",
-    page_icon="🚗❤️🤖"
+    page_icon="🤖"
 )
 
 # Title
